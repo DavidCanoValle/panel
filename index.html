@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#14161a">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>Mi Jornada</title>
+<style>
+:root{--bg:#f6f5f2;--card:#fff;--tx:#1d1f23;--mu:#6b7078;--ln:#e5e3de;--ac:#3b6fe0;--ok:#2f9e6a;--wa:#d9822b;--bad:#d24b4b;--aca:#3b6fe0;--per:#9a5bd6}
+@media (prefers-color-scheme:dark){:root{--bg:#14161a;--card:#1e2126;--tx:#eceef1;--mu:#9aa0a8;--ln:#2c3036;--ac:#6d98f5;--aca:#6d98f5;--per:#b98bf0}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 -apple-system,system-ui,sans-serif;padding:env(safe-area-inset-top) 16px calc(90px + env(safe-area-inset-bottom))}
+header{display:flex;justify-content:space-between;align-items:center;padding:14px 0 6px}h1{font-size:22px;margin:0}
+.est{font-size:14px;color:var(--mu)}button{font:inherit;border:0;border-radius:12px;padding:10px 14px;background:var(--ln);color:var(--tx);cursor:pointer}
+button.p{background:var(--ac);color:#fff}.row{display:flex;gap:8px;flex-wrap:wrap}
+.card{background:var(--card);border:1px solid var(--ln);border-radius:16px;padding:14px;margin:12px 0}
+h2{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--mu);margin:0 0 8px}
+.t{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--ln)}.t:first-of-type{border-top:0}
+.t input{width:22px;height:22px;margin-top:2px;accent-color:var(--ok)}.t .m{font-size:13px;color:var(--mu)}
+.tag{display:inline-block;font-size:11px;padding:1px 7px;border-radius:9px;margin-right:4px;color:#fff}.academico{background:var(--aca)}.personal{background:var(--per)}
+.late{color:var(--bad);font-weight:600}.hi{color:var(--wa)}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--card);border-top:1px solid var(--ln);padding:6px 8px calc(6px + env(safe-area-inset-bottom))}
+nav button{flex:1;background:none;font-size:13px;color:var(--mu);padding:8px 0}nav button.on{color:var(--ac);font-weight:600}
+textarea,input[type=text],input[type=password]{width:100%;font:inherit;padding:10px;border-radius:10px;border:1px solid var(--ln);background:var(--bg);color:var(--tx)}
+textarea{min-height:90px}.bar{height:8px;background:var(--ln);border-radius:4px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ok)}
+.seg{display:flex;gap:6px;margin-bottom:8px}.seg button{flex:1;padding:7px}.seg button.on{background:var(--ac);color:#fff}
+.toast{position:fixed;left:16px;right:16px;bottom:90px;background:var(--tx);color:var(--bg);padding:12px;border-radius:12px;text-align:center;display:none}
+pre{white-space:pre-wrap;font:inherit;margin:0}.vacio{color:var(--mu);font-size:14px}
+</style>
+</head>
+<body>
+<header><div><h1>Mi Jornada</h1><div class="est" id="est">…</div></div><button id="refr" aria-label="Actualizar">↻</button></header>
+
+<section id="v-hoy">
+  <div class="row" style="margin:8px 0"><button class="p" id="b-ini">☀️ Empiezo jornada</button><button id="b-fin">🌙 Acabo jornada</button></div>
+  <div class="card"><h2>Capturar</h2>
+    <div class="seg" id="area"><button data-a="" class="on">Auto</button><button data-a="academico">🎓 Uni</button><button data-a="personal">🌱 Personal</button></div>
+    <textarea id="txt" placeholder="¿Qué está pasando? (usa el micro del teclado para dictar)"></textarea>
+    <div class="row" style="margin-top:8px"><button class="p" id="b-cap">Guardar</button><label class="row"><button id="b-foto" type="button">📷 Foto</button></label><input type="file" id="foto" accept="image/*" capture="environment" hidden><button id="b-psico">🧠 #psico</button></div>
+  </div>
+  <div class="card" id="c-plan"><h2>🎯 Plan de esta jornada</h2><pre id="plan" class="vacio">—</pre></div>
+  <div class="card"><h2>🔥 Atrasadas</h2><div id="l-atr"></div></div>
+  <div class="card"><h2>Para esta jornada</h2><div id="l-hoy"></div></div>
+</section>
+<section id="v-semana" hidden><div class="card"><h2>Próximos 7 días</h2><div id="l-sem"></div></div><div class="card"><h2>Sin fecha</h2><div id="l-sin"></div></div><div class="card"><h2>✅ Hechas (7 días)</h2><div id="l-hec"></div></div></section>
+<section id="v-obj" hidden><div class="card"><h2>Objetivos</h2><div id="l-obj"></div></div></section>
+<section id="v-jor" hidden><div id="l-jor"></div></section>
+<section id="v-cfg" hidden><div class="card"><h2>Conexión con tu vault (GitHub)</h2>
+  <p class="vacio">El token se guarda solo en este móvil. Usa un token fine-grained con acceso únicamente al repo del vault (Contents: Read and write).</p>
+  <label>Usuario/organización<input type="text" id="c-own"></label><br><br>
+  <label>Repositorio<input type="text" id="c-rep" value="vault-erasmus"></label><br><br>
+  <label>Token<input type="password" id="c-tok"></label><br><br>
+  <button class="p" id="c-save">Guardar</button></div></section>
+
+<nav><button data-v="hoy" class="on">Hoy</button><button data-v="semana">Semana</button><button data-v="obj">Objetivos</button><button data-v="jor">Jornadas</button><button data-v="cfg">⚙︎</button></nav>
+<div class="toast" id="toast"></div>
+<script>
+const $=s=>document.querySelector(s);
+const st={get(k){try{return localStorage.getItem(k)||""}catch{return""}},set(k,v){try{localStorage.setItem(k,v)}catch{}}};
+let area="",panel=null;
+const cfg=()=>({own:st.get("own"),rep:st.get("rep")||"vault-erasmus",tok:st.get("tok")});
+function toast(m){const t=$("#toast");t.textContent=m;t.style.display="block";setTimeout(()=>t.style.display="none",2500)}
+async function gh(path,opt={}){const c=cfg();if(!c.tok||!c.own)throw new Error("Configura la conexión en ⚙︎");
+  const r=await fetch(`https://api.github.com/repos/${c.own}/${c.rep}/contents/${encodeURI(path)}`,{...opt,cache:"no-store",headers:{Authorization:`Bearer ${c.tok}`,Accept:"application/vnd.github+json",...(opt.headers||{})}});
+  if(!r.ok&&r.status!==404)throw new Error(`GitHub ${r.status}`);return r.status===404?null:r.json()}
+const b64=s=>btoa(unescape(encodeURIComponent(s)));const unb64=s=>decodeURIComponent(escape(atob(s.replace(/\n/g,""))));
+function iso(){const d=new Date(),o=-d.getTimezoneOffset(),p=n=>String(Math.floor(Math.abs(n))).padStart(2,"0");return new Date(d-d.getTimezoneOffset()*6e4).toISOString().slice(0,19)+(o>=0?"+":"-")+p(o/60)+":"+p(o%60)}
+async function capturar(tipo,texto,extra=""){const t=iso(),nombre=`00-Inbox/${t.slice(0,16).replace(/[T:]/g,"-")}-${Math.random().toString(36).slice(2,6)}.md`;
+  const md=`---\ntipo: ${tipo}\ncreado: ${t}\norigen: panel\n${area?`area: ${area}\n`:""}---\n${texto}${extra}\n`;
+  await gh(nombre,{method:"PUT",body:JSON.stringify({message:`captura: ${tipo}`,content:b64(md)})});}
+$("#b-cap").onclick=async()=>{const v=$("#txt").value.trim();if(!v)return;try{await capturar("texto",v);$("#txt").value="";toast("✓ Capturado")}catch(e){toast(e.message)}};
+$("#b-psico").onclick=()=>{const t=$("#txt");if(!t.value.includes("#psico"))t.value+=(t.value?" ":"")+"#psico";t.focus()};
+$("#b-ini").onclick=async()=>{const a=prompt("¿Cómo empiezas? (opcional: ánimo 1–10, cómo has dormido…)","");if(a===null)return;try{await capturar("inicio",a||"Empiezo jornada");toast("☀️ Jornada iniciada; el plan llega en breve")}catch(e){toast(e.message)}};
+$("#b-fin").onclick=async()=>{const an=prompt("Ánimo 1–10","");if(an===null)return;const en=prompt("Energía 1–10","")||"";const n=prompt("Algo que quieras contar de la jornada","")||"";
+  try{await capturar("fin",`animo: ${an}\nenergia: ${en}\n${n}`);toast("🌙 Jornada cerrada")}catch(e){toast(e.message)}};
+$("#b-foto").onclick=()=>$("#foto").click();
+$("#foto").onchange=async e=>{const f=e.target.files[0];if(!f)return;toast("Subiendo foto…");
+  const img=await new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=URL.createObjectURL(f)});const s=Math.min(1,1600/Math.max(img.width,img.height));
+  const cv=document.createElement("canvas");cv.width=img.width*s;cv.height=img.height*s;cv.getContext("2d").drawImage(img,0,0,cv.width,cv.height);
+  const data=cv.toDataURL("image/jpeg",.8).split(",")[1],n=`foto-${Date.now()}.jpg`;
+  try{await gh(`00-Inbox/adjuntos/${n}`,{method:"PUT",body:JSON.stringify({message:"captura: foto",content:data})});
+    await capturar("foto",$("#txt").value.trim()||"Foto",`\n![[${n}]]`);$("#txt").value="";toast("✓ Foto capturada")}catch(er){toast(er.message)}};
+document.querySelectorAll("#area button").forEach(b=>b.onclick=()=>{area=b.dataset.a;document.querySelectorAll("#area button").forEach(x=>x.classList.toggle("on",x===b))});
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("on",x===b));
+  document.querySelectorAll("section").forEach(s=>s.hidden=s.id!=="v-"+b.dataset.v)});
+const hoyStr=()=>iso().slice(0,10);
+function fila(t){const late=t.limite&&t.limite<hoyStr();const d=document.createElement("div");d.className="t";
+  d.innerHTML=`<input type="checkbox" ${t.hecha?"checked":""}><div><div>${esc(t.texto)}</div><div class="m"><span class="tag ${t.area}">${t.area==="academico"?"Uni":"Personal"}</span>${t.limite?`<span class="${late?"late":t.prioridad==="alta"?"hi":""}">📅 ${t.limite}</span> `:""}${t.inicio?`⏳ ${t.inicio}`:""}</div></div>`;
+  d.querySelector("input").onchange=async ev=>{try{await marcar(t,ev.target.checked);toast(ev.target.checked?"✓ ¡Hecho!":"Desmarcada")}catch(e){ev.target.checked=!ev.target.checked;toast(e.message)}};return d}
+const esc=s=>s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+async function marcar(t,on){const f=await gh(t.archivo);const ls=unb64(f.content).split("\n");
+  let i=ls.findIndex(l=>l===t.raw);if(i<0&&t.id)i=ls.findIndex(l=>l.includes("🆔 "+t.id));if(i<0)throw new Error("La tarea cambió; actualiza");
+  ls[i]=on?ls[i].replace("- [ ]","- [x]")+` ✅ ${hoyStr()}`:ls[i].replace("- [x]","- [ ]").replace(/ ✅ \d{4}-\d{2}-\d{2}/,"");
+  await gh(t.archivo,{method:"PUT",body:JSON.stringify({message:`tarea: ${on?"hecha":"reabierta"} ${t.texto.slice(0,40)}`,content:b64(ls.join("\n")),sha:f.sha})});t.raw=ls[i];t.hecha=on}
+function lista(sel,arr,vacio){const el=$(sel);el.innerHTML="";if(!arr.length){el.innerHTML=`<div class="vacio">${vacio}</div>`;return}arr.forEach(t=>el.appendChild(fila(t)))}
+function pintar(p){const j=p.jornada_actual;$("#est").textContent=j?`🟢 Jornada desde ${j.inicio.slice(11,16)}`+(p.ritmo.fin_habitual?` · sueles acabar ${p.ritmo.fin_habitual}`:""):"⚪ Sin jornada abierta";
+  const ult=p.jornadas[0];$("#plan").textContent=(ult&&ult.plan)||"El plan aparecerá al empezar la jornada.";
+  lista("#l-atr",p.atrasadas,"Nada atrasado 🙌");lista("#l-hoy",p.hoy,"Nada para hoy");lista("#l-sem",p.semana,"Semana libre");lista("#l-sin",p.sin_fecha,"—");lista("#l-hec",p.hechas_recientes,"—");
+  $("#l-obj").innerHTML=p.objetivos.map(o=>`<div class="t"><div style="flex:1"><div><span class="tag ${o.area}">${o.area==="academico"?"Uni":"Personal"}</span>${esc(o.titulo)}</div><div class="m">${o.fecha?"📅 "+o.fecha:""}</div>${o.progreso!=null?`<div class="bar"><i style="width:${o.progreso}%"></i></div>`:""}</div></div>`).join("")||'<div class="vacio">Aún no hay objetivos.</div>';
+  $("#l-jor").innerHTML=p.jornadas.map(x=>`<div class="card"><h2>${x.nota} · ${x.inicio?x.inicio.slice(11,16):""}–${x.fin?x.fin.slice(11,16):"…"} ${x.hechas?`· ${x.hechas}/${x.planificadas}`:""}</h2><pre>${esc(x.resumen||x.plan||"(sin resumen todavía)")}</pre></div>`).join("")||'<div class="vacio">Aún no hay jornadas.</div>'}
+async function cargar(){try{const f=await gh("_sistema/panel.json");if(!f){$("#est").textContent="Aún no hay panel generado";return}
+  panel=JSON.parse(unb64(f.content));pintar(panel);try{localStorage.setItem("panel",JSON.stringify(panel))}catch{}}catch(e){$("#est").textContent=e.message;try{const c=localStorage.getItem("panel");if(c)pintar(JSON.parse(c))}catch{}}}
+$("#refr").onclick=cargar;
+$("#c-own").value=cfg().own;$("#c-rep").value=cfg().rep;$("#c-tok").value=cfg().tok;
+$("#c-save").onclick=()=>{st.set("own",$("#c-own").value.trim());st.set("rep",$("#c-rep").value.trim());st.set("tok",$("#c-tok").value.trim());toast("Guardado");cargar()};
+if(!cfg().tok)document.querySelector('nav button[data-v=cfg]').click();cargar();
+if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
+</script>
+</body></html>

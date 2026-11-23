@@ -28,6 +28,7 @@ textarea,input[type=text],input[type=password]{width:100%;font:inherit;padding:1
 textarea{min-height:90px}.bar{height:8px;background:var(--ln);border-radius:4px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ok)}
 .seg{display:flex;gap:6px;margin-bottom:8px}.seg button{flex:1;padding:7px}.seg button.on{background:var(--ac);color:#fff}
 .toast{position:fixed;left:16px;right:16px;bottom:90px;background:var(--tx);color:var(--bg);padding:12px;border-radius:12px;text-align:center;display:none}
+.mv{gap:6px;margin-top:6px;flex-wrap:wrap}.mv button{padding:4px 10px;font-size:13px}.fecha{display:inline-flex;align-items:center;gap:4px;font-size:13px}.fecha input{font-size:13px;padding:2px 4px;min-width:130px}
 pre{white-space:pre-wrap;font:inherit;margin:0}.vacio{color:var(--mu);font-size:14px}
 </style>
 </head>
@@ -46,6 +47,11 @@ pre{white-space:pre-wrap;font:inherit;margin:0}.vacio{color:var(--mu);font-size:
   <div class="card"><h2>🔥 Atrasadas</h2><div id="l-atr"></div></div>
   <div class="card"><h2>Para esta jornada</h2><div id="l-hoy"></div></div>
 </section>
+<section id="v-tar" hidden>
+  <div class="card"><h2>⏸️ Pendientes (empezadas, no programadas hoy)</h2><div id="l-pen"></div></div>
+  <div class="card"><h2>🔜 Próximas</h2><div id="l-pro"></div></div>
+  <div class="card"><h2>Sin fecha</h2><div id="l-sin2"></div></div>
+</section>
 <section id="v-semana" hidden><div class="card"><h2>Próximos 7 días</h2><div id="l-sem"></div></div><div class="card"><h2>Sin fecha</h2><div id="l-sin"></div></div><div class="card"><h2>✅ Hechas (7 días)</h2><div id="l-hec"></div></div></section>
 <section id="v-obj" hidden><div class="card"><h2>Objetivos</h2><div id="l-obj"></div></div></section>
 <section id="v-jor" hidden><div id="l-jor"></div></section>
@@ -56,7 +62,7 @@ pre{white-space:pre-wrap;font:inherit;margin:0}.vacio{color:var(--mu);font-size:
   <label>Token<input type="password" id="c-tok"></label><br><br>
   <button class="p" id="c-save">Guardar</button></div></section>
 
-<nav><button data-v="hoy" class="on">Hoy</button><button data-v="semana">Semana</button><button data-v="obj">Objetivos</button><button data-v="jor">Jornadas</button><button data-v="cfg">⚙︎</button></nav>
+<nav><button data-v="hoy" class="on">Hoy</button><button data-v="tar">Tareas</button><button data-v="semana">Semana</button><button data-v="obj">Objetivos</button><button data-v="jor">Jornadas</button><button data-v="cfg">⚙︎</button></nav>
 <div class="toast" id="toast"></div>
 <script>
 const $=s=>document.querySelector(s);
@@ -88,15 +94,28 @@ document.querySelectorAll("#area button").forEach(b=>b.onclick=()=>{area=b.datas
 document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("on",x===b));
   document.querySelectorAll("section").forEach(s=>s.hidden=s.id!=="v-"+b.dataset.v)});
 const hoyStr=()=>iso().slice(0,10);
-function fila(t){const late=t.limite&&t.limite<hoyStr();const d=document.createElement("div");d.className="t";
+function diaJ(){return (panel&&panel.dia_jornada)||hoyStr()}
+function sumar(f,n){const d=new Date(f+"T12:00:00");d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)}
+async function mover(t,fecha){const f=await gh(t.archivo);const ls=unb64(f.content).split("\n");
+  let i=ls.findIndex(l=>l===t.raw);if(i<0&&t.id)i=ls.findIndex(l=>l.includes("🆔 "+t.id));if(i<0)throw new Error("La tarea cambió; actualiza");
+  let l=ls[i].replace(/ ?⏳ \d{4}-\d{2}-\d{2}/,"").replace(/ #sin-fecha/,"");
+  if(fecha){const m=l.match(/ (📅|🔺|⏫|🔼|🔽|🆔)/);l=m?l.slice(0,m.index)+` ⏳ ${fecha}`+l.slice(m.index):l+` ⏳ ${fecha}`}
+  ls[i]=l;await gh(t.archivo,{method:"PUT",body:JSON.stringify({message:`tarea: ⏳ ${fecha||"sin fecha"} ${t.texto.slice(0,40)}`,content:b64(ls.join("\n")),sha:f.sha})});t.raw=l;t.inicio=fecha}
+function botonesMover(t,d){const b=document.createElement("div");b.className="row mv";
+  const hoy=diaJ(),man=sumar(hoyStr(),1),esHoy=t.inicio&&t.inicio>=hoy&&t.inicio<=hoyStr();
+  b.innerHTML=(esHoy?`<button data-f="${man}">→ Mañana</button>`:`<button data-f="${hoyStr()}">→ Hoy</button><button data-f="${man}">Mañana</button>`)+`<label class="fecha">📆<input type="date" value="${t.inicio||""}"></label>`;
+  const go=async f=>{d.style.opacity=.4;try{await mover(t,f);toast(f?`⏳ ${f}`:"Sin fecha");d.remove()}catch(e){d.style.opacity=1;toast(e.message)}};
+  b.querySelectorAll("button").forEach(x=>x.onclick=()=>go(x.dataset.f));b.querySelector("input").onchange=e=>go(e.target.value);return b}
+function fila(t,mov){const late=t.limite&&t.limite<hoyStr();const d=document.createElement("div");d.className="t";
   d.innerHTML=`<input type="checkbox" ${t.hecha?"checked":""}><div><div>${esc(t.texto)}</div><div class="m"><span class="tag ${t.area}">${t.area==="academico"?"Uni":"Personal"}</span>${t.limite?`<span class="${late?"late":t.prioridad==="alta"?"hi":""}">📅 ${t.limite}</span> `:""}${t.inicio?`⏳ ${t.inicio}`:""}</div></div>`;
-  d.querySelector("input").onchange=async ev=>{try{await marcar(t,ev.target.checked);toast(ev.target.checked?"✓ ¡Hecho!":"Desmarcada")}catch(e){ev.target.checked=!ev.target.checked;toast(e.message)}};return d}
+  d.querySelector("input").onchange=async ev=>{try{await marcar(t,ev.target.checked);toast(ev.target.checked?"✓ ¡Hecho!":"Desmarcada")}catch(e){ev.target.checked=!ev.target.checked;toast(e.message)}};
+  if(mov&&!t.hecha)d.children[1].appendChild(botonesMover(t,d));return d}
 const esc=s=>s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
 async function marcar(t,on){const f=await gh(t.archivo);const ls=unb64(f.content).split("\n");
   let i=ls.findIndex(l=>l===t.raw);if(i<0&&t.id)i=ls.findIndex(l=>l.includes("🆔 "+t.id));if(i<0)throw new Error("La tarea cambió; actualiza");
   ls[i]=on?ls[i].replace("- [ ]","- [x]")+` ✅ ${hoyStr()}`:ls[i].replace("- [x]","- [ ]").replace(/ ✅ \d{4}-\d{2}-\d{2}/,"");
   await gh(t.archivo,{method:"PUT",body:JSON.stringify({message:`tarea: ${on?"hecha":"reabierta"} ${t.texto.slice(0,40)}`,content:b64(ls.join("\n")),sha:f.sha})});t.raw=ls[i];t.hecha=on}
-function lista(sel,arr,vacio){const el=$(sel);el.innerHTML="";if(!arr.length){el.innerHTML=`<div class="vacio">${vacio}</div>`;return}arr.forEach(t=>el.appendChild(fila(t)))}
+function lista(sel,arr,vacio,mov){const el=$(sel);el.innerHTML="";if(!arr.length){el.innerHTML=`<div class="vacio">${vacio}</div>`;return}arr.forEach(t=>el.appendChild(fila(t,mov)))}
 function pintarAnuncios(arr){const el=$("#anun");el.innerHTML="";
   if(!arr.length){el.innerHTML='<div class="vacio">Nada pendiente de leer 🙌</div>';return}
   arr.forEach(a=>{const d=document.createElement("div");d.className="t";
@@ -108,7 +127,7 @@ async function leido(texto){for(let i=0;i<3;i++){const f=await gh("_sistema/anun
   try{await gh("_sistema/anuncios_leidos.json",{method:"PUT",body:JSON.stringify({message:"anuncio leído",content:b64(JSON.stringify(l,null,1)),...(f?{sha:f.sha}:{})})});return}catch(e){if(i==2)throw e}}}
 function pintar(p){const j=p.jornada_actual;$("#est").textContent=j?`🟢 Jornada desde ${j.inicio.slice(11,16)}`+(p.ritmo.fin_habitual?` · sueles acabar ${p.ritmo.fin_habitual}`:""):"⚪ Sin jornada abierta";
   const ult=p.jornadas[0];$("#plan").textContent=(ult&&ult.plan)||"El plan aparecerá al empezar la jornada.";pintarAnuncios(p.anuncios||[]);
-  lista("#l-atr",p.atrasadas,"Nada atrasado 🙌");lista("#l-hoy",p.hoy,"Nada para hoy");lista("#l-sem",p.semana,"Semana libre");lista("#l-sin",p.sin_fecha,"—");lista("#l-hec",p.hechas_recientes,"—");
+  lista("#l-atr",p.atrasadas,"Nada atrasado 🙌");lista("#l-hoy",p.hoy,"Nada para hoy",true);lista("#l-pen",p.pendientes||[],"Nada pendiente 🙌",true);lista("#l-pro",p.proximas||[],"—",true);lista("#l-sin2",p.sin_fecha,"—",true);lista("#l-sem",p.semana,"Semana libre");lista("#l-sin",p.sin_fecha,"—");lista("#l-hec",p.hechas_recientes,"—");
   $("#l-obj").innerHTML=p.objetivos.map(o=>`<div class="t"><div style="flex:1"><div><span class="tag ${o.area}">${o.area==="academico"?"Uni":"Personal"}</span>${esc(o.titulo)}</div><div class="m">${o.fecha?"📅 "+o.fecha:""}</div>${o.progreso!=null?`<div class="bar"><i style="width:${o.progreso}%"></i></div>`:""}</div></div>`).join("")||'<div class="vacio">Aún no hay objetivos.</div>';
   $("#l-jor").innerHTML=p.jornadas.map(x=>`<div class="card"><h2>${x.nota} · ${x.inicio?x.inicio.slice(11,16):""}–${x.fin?x.fin.slice(11,16):"…"} ${x.hechas?`· ${x.hechas}/${x.planificadas}`:""}</h2><pre>${esc(x.resumen||x.plan||"(sin resumen todavía)")}</pre></div>`).join("")||'<div class="vacio">Aún no hay jornadas.</div>'}
 async function cargar(){try{const f=await gh("_sistema/panel.json");if(!f){$("#est").textContent="Aún no hay panel generado";return}

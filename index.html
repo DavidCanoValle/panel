@@ -75,8 +75,8 @@ async function capturar(tipo,texto,extra=""){const t=iso(),nombre=`00-Inbox/${t.
 $("#b-cap").onclick=async()=>{const v=$("#txt").value.trim();if(!v)return;try{await capturar("texto",v);$("#txt").value="";toast("✓ Capturado")}catch(e){toast(e.message)}};
 $("#b-psico").onclick=()=>{const t=$("#txt");if(!t.value.includes("#psico"))t.value+=(t.value?" ":"")+"#psico";t.focus()};
 $("#b-ini").onclick=async()=>{const a=prompt("¿Cómo empiezas? (opcional: ánimo 1–10, cómo has dormido…)","");if(a===null)return;try{await capturar("inicio",a||"Empiezo jornada");toast("☀️ Jornada iniciada; el plan llega en breve")}catch(e){toast(e.message)}};
-$("#b-fin").onclick=async()=>{const an=prompt("Ánimo 1–10","");if(an===null)return;const en=prompt("Energía 1–10","")||"";const n=prompt("Algo que quieras contar de la jornada","")||"";
-  try{await capturar("fin",`animo: ${an}\nenergia: ${en}\n${n}`);toast("🌙 Jornada cerrada")}catch(e){toast(e.message)}};
+$("#b-fin").onclick=async()=>{const n=prompt("¿Cómo ha ido la jornada?","");if(n===null)return;
+  try{await capturar("fin",n||"Fin de jornada");toast("🌙 Jornada cerrada")}catch(e){toast(e.message)}};
 $("#b-foto").onclick=()=>$("#foto").click();
 $("#foto").onchange=async e=>{const f=e.target.files[0];if(!f)return;toast("Subiendo foto…");
   const img=await new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=URL.createObjectURL(f)});const s=Math.min(1,1600/Math.max(img.width,img.height));

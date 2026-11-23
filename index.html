@@ -42,6 +42,7 @@ pre{white-space:pre-wrap;font:inherit;margin:0}.vacio{color:var(--mu);font-size:
     <div class="row" style="margin-top:8px"><button class="p" id="b-cap">Guardar</button><label class="row"><button id="b-foto" type="button">📷 Foto</button></label><input type="file" id="foto" accept="image/*" capture="environment" hidden><button id="b-psico">🧠 #psico</button></div>
   </div>
   <div class="card" id="c-plan"><h2>🎯 Plan de esta jornada</h2><pre id="plan" class="vacio">—</pre></div>
+  <div class="card" id="c-anun"><h2>📣 Anuncios</h2><pre id="anun" class="vacio">—</pre></div>
   <div class="card"><h2>🔥 Atrasadas</h2><div id="l-atr"></div></div>
   <div class="card"><h2>Para esta jornada</h2><div id="l-hoy"></div></div>
 </section>
@@ -97,7 +98,7 @@ async function marcar(t,on){const f=await gh(t.archivo);const ls=unb64(f.content
   await gh(t.archivo,{method:"PUT",body:JSON.stringify({message:`tarea: ${on?"hecha":"reabierta"} ${t.texto.slice(0,40)}`,content:b64(ls.join("\n")),sha:f.sha})});t.raw=ls[i];t.hecha=on}
 function lista(sel,arr,vacio){const el=$(sel);el.innerHTML="";if(!arr.length){el.innerHTML=`<div class="vacio">${vacio}</div>`;return}arr.forEach(t=>el.appendChild(fila(t)))}
 function pintar(p){const j=p.jornada_actual;$("#est").textContent=j?`🟢 Jornada desde ${j.inicio.slice(11,16)}`+(p.ritmo.fin_habitual?` · sueles acabar ${p.ritmo.fin_habitual}`:""):"⚪ Sin jornada abierta";
-  const ult=p.jornadas[0];$("#plan").textContent=(ult&&ult.plan)||"El plan aparecerá al empezar la jornada.";
+  const ult=p.jornadas[0];$("#plan").textContent=(ult&&ult.plan)||"El plan aparecerá al empezar la jornada.";$("#anun").textContent=(ult&&ult.anuncios)||"Sin anuncios importantes en esta jornada.";
   lista("#l-atr",p.atrasadas,"Nada atrasado 🙌");lista("#l-hoy",p.hoy,"Nada para hoy");lista("#l-sem",p.semana,"Semana libre");lista("#l-sin",p.sin_fecha,"—");lista("#l-hec",p.hechas_recientes,"—");
   $("#l-obj").innerHTML=p.objetivos.map(o=>`<div class="t"><div style="flex:1"><div><span class="tag ${o.area}">${o.area==="academico"?"Uni":"Personal"}</span>${esc(o.titulo)}</div><div class="m">${o.fecha?"📅 "+o.fecha:""}</div>${o.progreso!=null?`<div class="bar"><i style="width:${o.progreso}%"></i></div>`:""}</div></div>`).join("")||'<div class="vacio">Aún no hay objetivos.</div>';
   $("#l-jor").innerHTML=p.jornadas.map(x=>`<div class="card"><h2>${x.nota} · ${x.inicio?x.inicio.slice(11,16):""}–${x.fin?x.fin.slice(11,16):"…"} ${x.hechas?`· ${x.hechas}/${x.planificadas}`:""}</h2><pre>${esc(x.resumen||x.plan||"(sin resumen todavía)")}</pre></div>`).join("")||'<div class="vacio">Aún no hay jornadas.</div>'}

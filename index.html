@@ -120,7 +120,7 @@ function pintarAnuncios(arr){const el=$("#anun");el.innerHTML="";
   if(!arr.length){el.innerHTML='<div class="vacio">Nada pendiente de leer 🙌</div>';return}
   arr.forEach(a=>{const d=document.createElement("div");d.className="t";
     d.innerHTML=`<button title="Marcar como leído">✓</button><div style="flex:1">${esc(a.texto)}<div class="m">${esc(a.jornada.replace("J-",""))}</div></div>`;
-    d.querySelector("button").onclick=async()=>{d.style.opacity=.4;try{await leido(a.texto);d.remove();panel.anuncios=panel.anuncios.filter(x=>x.texto!==a.texto);if(!panel.anuncios.length)pintarAnuncios([]);toast("✓ Leído")}catch(e){d.style.opacity=1;toast(e.message)}};
+    d.querySelector("button").onclick=async()=>{d.style.opacity=.4;try{await leido(a.id||a.texto);d.remove();panel.anuncios=panel.anuncios.filter(x=>x!==a);if(!panel.anuncios.length)pintarAnuncios([]);toast("✓ Leído")}catch(e){d.style.opacity=1;toast(e.message)}};
     el.appendChild(d)})}
 async function leido(texto){for(let i=0;i<3;i++){const f=await gh("_sistema/anuncios_leidos.json");const l=f?JSON.parse(unb64(f.content)):[];
   if(l.includes(texto))return;l.push(texto);

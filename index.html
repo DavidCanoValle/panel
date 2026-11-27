@@ -29,6 +29,7 @@ textarea{min-height:90px}.bar{height:8px;background:var(--ln);border-radius:4px;
 .seg{display:flex;gap:6px;margin-bottom:8px}.seg button{flex:1;padding:7px}.seg button.on{background:var(--ac);color:#fff}
 .toast{position:fixed;left:16px;right:16px;bottom:90px;background:var(--tx);color:var(--bg);padding:12px;border-radius:12px;text-align:center;display:none}
 .mv{gap:6px;margin-top:6px;flex-wrap:wrap}.mv button{padding:4px 10px;font-size:13px}.fecha{display:inline-flex;align-items:center;gap:4px;font-size:13px}.fecha input{font-size:13px;padding:2px 4px;min-width:130px}
+#b-voz[data-s="rec"]{background:#c0392b;color:#fff;border-color:#c0392b}#b-voz[data-s="work"]{opacity:.7}
 pre{white-space:pre-wrap;font:inherit;margin:0}.vacio{color:var(--mu);font-size:14px}
 </style>
 </head>
@@ -40,7 +41,7 @@ pre{white-space:pre-wrap;font:inherit;margin:0}.vacio{color:var(--mu);font-size:
   <div class="card"><h2>Capturar</h2>
     <div class="seg" id="area"><button data-a="" class="on">Auto</button><button data-a="academico">🎓 Uni</button><button data-a="personal">🌱 Personal</button></div>
     <textarea id="txt" placeholder="¿Qué está pasando? (usa el micro del teclado para dictar)"></textarea>
-    <div class="row" style="margin-top:8px"><button class="p" id="b-cap">Guardar</button><label class="row"><button id="b-foto" type="button">📷 Foto</button></label><input type="file" id="foto" accept="image/*" capture="environment" hidden><button id="b-psico">🧠 #psico</button></div>
+    <div class="row" style="margin-top:8px"><button class="p" id="b-cap">Guardar</button><button id="b-voz" type="button" data-s="idle">🎙️ Hablar</button><label class="row"><button id="b-foto" type="button">📷 Foto</button></label><input type="file" id="foto" accept="image/*" capture="environment" hidden><button id="b-psico">🧠 #psico</button></div>
   </div>
   <div class="card" id="c-plan"><h2>🎯 Plan de esta jornada</h2><pre id="plan" class="vacio">—</pre></div>
   <div class="card" id="c-anun"><h2>📣 Anuncios</h2><div id="anun"></div></div>
@@ -60,6 +61,8 @@ pre{white-space:pre-wrap;font:inherit;margin:0}.vacio{color:var(--mu);font-size:
   <label>Usuario/organización<input type="text" id="c-own"></label><br><br>
   <label>Repositorio<input type="text" id="c-rep" value="vault-erasmus"></label><br><br>
   <label>Token<input type="password" id="c-tok"></label><br><br>
+  <label>Clave de Groq (voz)<input type="password" id="c-groq" autocomplete="off"></label><br><br>
+  <label>Modelo de limpieza (opcional)<input type="text" id="c-gmod" placeholder="llama-3.3-70b-versatile"></label><br><br>
   <button class="p" id="c-save">Guardar</button></div></section>
 
 <nav><button data-v="hoy" class="on">Hoy</button><button data-v="tar">Tareas</button><button data-v="semana">Semana</button><button data-v="obj">Objetivos</button><button data-v="jor">Jornadas</button><button data-v="cfg">⚙︎</button></nav>
@@ -133,8 +136,50 @@ function pintar(p){const j=p.jornada_actual;$("#est").textContent=j?`🟢 Jornad
 async function cargar(){try{const f=await gh("_sistema/panel.json");if(!f){$("#est").textContent="Aún no hay panel generado";return}
   panel=JSON.parse(unb64(f.content));pintar(panel);try{localStorage.setItem("panel",JSON.stringify(panel))}catch{}}catch(e){$("#est").textContent=e.message;try{const c=localStorage.getItem("panel");if(c)pintar(JSON.parse(c))}catch{}}}
 $("#refr").onclick=cargar;
-$("#c-own").value=cfg().own;$("#c-rep").value=cfg().rep;$("#c-tok").value=cfg().tok;
-$("#c-save").onclick=()=>{st.set("own",$("#c-own").value.trim());st.set("rep",$("#c-rep").value.trim());st.set("tok",$("#c-tok").value.trim());toast("Guardado");cargar()};
+$("#c-own").value=cfg().own;$("#c-rep").value=cfg().rep;$("#c-tok").value=cfg().tok;$("#c-groq").value=st.get("groq");$("#c-gmod").value=st.get("groqModel");
+$("#c-save").onclick=()=>{st.set("own",$("#c-own").value.trim());st.set("rep",$("#c-rep").value.trim());st.set("tok",$("#c-tok").value.trim());st.set("groq",$("#c-groq").value.trim());st.set("groqModel",$("#c-gmod").value.trim());toast("Guardado");cargar()};
+
+// ---- Voz: grabar → Whisper (Groq) → limpieza → al cuadro de texto ----
+const VOZ_PROMPT="Capturas de David, estudiante Erasmus en el Politecnico di Milano. Vocabulario: WeBeep, Polimi, RASD, DD, Alloy, Embedded Systems, Distributed Systems, Foundations of AI, Mobile Apps, Software Engineering 2, Fornaciari, Cugola, Baresi, Amigoni, Lanzi, Di Nitto, Camilli, Webex, Obsidian, jornada, captura, almohadilla psico.";
+const LIMPIEZA=`Recibes la transcripción literal de una nota de voz de David (español, a veces con palabras en inglés o italiano). Devuelve SOLO el texto final, sin comillas ni comentarios.
+Reglas:
+- Mismo contenido y misma persona (habla David en primera persona). No resumas, no añadas nada, no respondas a lo que dice.
+- Quita muletillas, titubeos y repeticiones ("eh", "o sea", "bueno pues", "es que es que").
+- Aplica sus autocorrecciones: "el martes, no, el jueves" -> "el jueves"; "a las cinco, bueno, a las seis" -> "a las seis".
+- Puntúa y separa en frases completas. Fechas y horas claras (17:00, 3 de diciembre).
+- Si dice "almohadilla X" o "hashtag X", escribe #X (p. ej. #psico).
+- Respeta nombres propios y términos: WeBeep, RASD, Polimi, nombres de profesores y asignaturas.`;
+let rec=null,trozos=[],t0=0,reloj=null;
+const vozTxt=()=>$("#b-voz");
+function vozEstado(s){const b=vozTxt();b.dataset.s=s;b.textContent={idle:"🎙️ Hablar",rec:"⏹ 0:00",work:"⏳ Escribiendo…"}[s];b.disabled=s==="work"}
+async function groq(path,body,json){const k=st.get("groq");if(!k)throw new Error("Falta la clave de Groq (⚙︎)");
+  const r=await fetch("https://api.groq.com/openai/v1/"+path,{method:"POST",headers:{Authorization:"Bearer "+k,...(json?{"Content-Type":"application/json"}:{})},body:json?JSON.stringify(body):body});
+  if(!r.ok)throw new Error("Groq "+r.status);return r.json()}
+async function transcribir(blob){const ext=(blob.type.includes("mp4")||blob.type.includes("m4a"))?"m4a":blob.type.includes("ogg")?"ogg":"webm";
+  const f=new FormData();f.append("file",blob,"voz."+ext);f.append("model","whisper-large-v3");f.append("language","es");f.append("prompt",VOZ_PROMPT);f.append("response_format","json");
+  return (await groq("audio/transcriptions",f,false)).text.trim()}
+async function limpiar(t){try{const r=await groq("chat/completions",{model:st.get("groqModel")||"llama-3.3-70b-versatile",temperature:0.1,
+    messages:[{role:"system",content:LIMPIEZA},{role:"user",content:t}]},true);return (r.choices[0].message.content||"").trim()||t}
+  catch(e){toast("Sin limpieza ("+e.message+"): texto literal");return t}}
+async function guardarAudio(blob,motivo){const ext=blob.type.includes("mp4")?"m4a":"webm",n=`voz-${Date.now()}.${ext}`;
+  const data=await new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result.split(",")[1]);fr.readAsDataURL(blob)});
+  await gh(`00-Inbox/adjuntos/${n}`,{method:"PUT",body:JSON.stringify({message:"captura: audio",content:data})});
+  await capturar("audio",`Nota de voz sin transcribir (${motivo})`,`\n![[${n}]]`)}
+async function finVoz(){const blob=new Blob(trozos,{type:rec.mimeType||"audio/mp4"});vozEstado("work");
+  try{const crudo=await transcribir(blob);if(!crudo){toast("No se oyó nada");return}
+    const limpio=await limpiar(crudo);const t=$("#txt");t.value=(t.value.trim()?t.value.trim()+"\n":"")+limpio;t.focus();toast("✓ Revísalo y pulsa Guardar")}
+  catch(e){try{await guardarAudio(blob,e.message);toast("No pude transcribir: audio guardado en el Inbox")}catch(e2){toast("Error: "+e.message+" / "+e2.message)}}
+  finally{vozEstado("idle")}}
+$("#b-voz").onclick=async()=>{const b=vozTxt();if(b.dataset.s==="rec"){rec.stop();return}
+  try{const s=await navigator.mediaDevices.getUserMedia({audio:true});
+    const tipo=["audio/mp4","audio/webm;codecs=opus","audio/webm"].find(x=>window.MediaRecorder&&MediaRecorder.isTypeSupported(x));
+    rec=new MediaRecorder(s,tipo?{mimeType:tipo}:{});trozos=[];
+    rec.ondataavailable=e=>e.data.size&&trozos.push(e.data);
+    rec.onstop=()=>{clearInterval(reloj);s.getTracks().forEach(x=>x.stop());finVoz()};
+    rec.start();t0=Date.now();vozEstado("rec");
+    reloj=setInterval(()=>{const d=Math.floor((Date.now()-t0)/1000);b.textContent=`⏹ ${Math.floor(d/60)}:${String(d%60).padStart(2,"0")}`;if(d>=600)rec.stop()},500)}
+  catch(e){toast("Sin micrófono: "+e.message)}};
+vozEstado("idle");
 if(!cfg().tok)document.querySelector('nav button[data-v=cfg]').click();cargar();
 if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
 </script>

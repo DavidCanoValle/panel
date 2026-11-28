@@ -61,14 +61,25 @@ header .row{justify-content:space-between;flex-wrap:nowrap}
 .live::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.55) 50%,transparent 70%);transform:translateX(-100%);animation:brillo 1.8s infinite}
 @keyframes brillo{to{transform:translateX(100%)}}
 /* línea de la jornada */
-.linea-wrap{margin-top:10px}
-.linea{position:relative;height:12px;border-radius:999px;background:var(--fill2);border:1px solid var(--rim);overflow:hidden}
-.linea i{position:absolute;top:0;bottom:0;border-radius:999px;background:var(--uni);opacity:.85;border-right:2px solid var(--bg)}
-.linea i.personal{background:var(--per)}
-.linea .ya{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,transparent,var(--mu));opacity:.25}
-.linea .ahora{position:absolute;top:-2px;bottom:-2px;width:3px;border-radius:2px;background:var(--ink)}
-.linea-pie{display:flex;justify-content:space-between;font-size:12px;color:var(--mu);margin-top:4px}
-.linea-pie b{color:var(--late);font-weight:600}
+.linea-wrap{position:relative;margin-top:10px;cursor:pointer;border-radius:var(--r-m);padding:2px 0}
+.lj-txt{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:12.5px;color:var(--mu);margin:6px 0 4px}
+.lj-txt b{color:var(--ink);font-weight:650}.lj-txt b.mal{color:var(--late)}.lj-txt .pista{color:var(--ac);font-weight:600}
+.linea{position:relative;height:8px;border-radius:999px;background:var(--fill2);border:1px solid var(--rim)}
+.linea .ya{position:absolute;left:0;top:0;bottom:0;border-radius:999px;background:linear-gradient(90deg,color-mix(in srgb,var(--ac) 25%,transparent),color-mix(in srgb,var(--ac) 70%,transparent))}
+.linea .ahora{position:absolute;top:-4px;bottom:-4px;width:3px;margin-left:-1.5px;border-radius:2px;background:var(--ink);box-shadow:0 0 0 2px var(--glass)}
+.tira{display:flex;gap:3px;height:12px}
+.tira i{flex-basis:0;min-width:8px;border-radius:5px;background:var(--uni);opacity:.85}
+.tira i.personal{background:var(--per)}.tira i.hecho{opacity:.25}
+.tira i.toca{opacity:1;filter:brightness(1.18) saturate(1.2);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.55)}
+.lj-det{position:absolute;left:-6px;right:-6px;top:calc(100% + 12px);z-index:25;padding:12px 14px;border-radius:var(--r-l);cursor:default;
+  background:color-mix(in srgb,var(--bg) 97%,transparent);-webkit-backdrop-filter:blur(26px) saturate(180%);backdrop-filter:blur(26px) saturate(180%);border:1px solid var(--rim);box-shadow:inset 0 1px 0 var(--spec),0 16px 40px var(--shadow);animation:aparece .3s var(--spring)}
+@media (max-width:699px){.lj-det ol li{grid-template-columns:1fr auto;gap:0 10px}.lj-det ol li>span:first-child{grid-column:1/-1;font-size:12px;margin-top:6px}}
+.lj-det ol{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.lj-det li{display:grid;grid-template-columns:96px 1fr auto;gap:10px;font-size:13.5px;align-items:baseline}
+.lj-det li>span:first-child{color:var(--mu);font-variant-numeric:tabular-nums}.lj-det li b{font-weight:550}
+.lj-det li.hecho{color:var(--mu)}.lj-det li.hecho b{text-decoration:line-through;font-weight:400}
+.lj-det li.toca b{color:var(--ac)}
+.nota-lj{margin:8px 0 0;font-size:12.5px;color:var(--mu)}
 /* secciones */
 section[hidden]{display:none}
 .panel{border-radius:var(--r-xl);padding:14px;margin:0 0 14px}
@@ -86,7 +97,12 @@ section[hidden]{display:none}
 .t .chk{width:24px;height:24px;border-radius:50%;border:2px solid var(--mu);margin-top:1px;display:grid;place-items:center;transition:all .3s var(--spring)}
 .t.hecha .chk{background:var(--ok);border-color:var(--ok)}.t.hecha .chk::after{content:"";width:6px;height:11px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg) translate(-1px,-1px)}
 .t.hecha .tx{text-decoration:line-through;color:var(--mu)}
-.t .tx{font-size:15.5px;line-height:1.35;word-break:break-word}
+.t .cont{min-width:0;cursor:pointer}
+.t .tx{font-size:15.5px;line-height:1.3;font-weight:560;word-break:break-word}
+.t .dt{font-size:13.5px;line-height:1.35;color:var(--mu);margin-top:2px;word-break:break-word;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.t.abierta-det .dt{-webkit-line-clamp:unset;display:block}
+.t.hecha .tx{font-weight:450}
+.full .fdet{max-width:520px;margin-top:6px;font-size:15px}
 .t .meta:empty{display:none}.t .tx .dot{vertical-align:2px;margin-right:2px}
 .t .meta{grid-column:2;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 .chip{font-size:12.5px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--fill2);border:1px solid var(--rim);white-space:nowrap}
@@ -148,8 +164,20 @@ textarea{min-height:84px;resize:vertical}
 .anun{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start;padding:10px 2px;border-top:1px solid var(--rim)}.anun:first-child{border-top:0}
 .anun .f{font-size:12.5px;color:var(--mu);margin-top:2px}
 /* metas */
-.meta-c{border-radius:var(--r-l);padding:16px;display:grid;grid-template-columns:auto 1fr;gap:4px 16px;align-items:center;margin-bottom:12px}
-.meta-c .dias{grid-row:1/4;text-align:center;min-width:64px}.meta-c .dias b{display:block;font:700 40px/1 var(--round)}.meta-c .dias span{font-size:12px;color:var(--mu)}
+.meta-c{border-radius:var(--r-l);padding:16px 18px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 18px;align-items:center;margin-bottom:12px}
+.meta-c .dias{grid-row:1/3;text-align:center;min-width:64px}
+.mc-tit{font-size:16px}.mc-desc{font-size:14px;color:var(--mu);margin-top:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.mc-num{display:flex;justify-content:space-between;font-size:13px;color:var(--mu);margin-top:5px}.mc-num b{color:var(--ink);font-weight:600}
+.mc-sig{font-size:13px;color:var(--mu);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.jor{border-radius:var(--r-l);padding:16px 18px;margin-bottom:12px;display:grid;gap:10px}
+.jor-meta{display:flex;flex-direction:column;gap:3px}.jor-meta b{font-size:16px;text-transform:capitalize}.jor-meta .prog{margin-top:6px}
+.jor-tipo{font-size:12.5px;font-weight:600;margin-bottom:3px}
+.jor pre.clamp{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.jor .ver{margin-top:8px}
+@media (min-width:1024px){
+  .meta-c{grid-template-columns:84px minmax(0,1.5fr) minmax(260px,1fr);min-height:104px;gap:6px 28px}
+  .meta-c .dias{grid-row:auto}
+  .jor{grid-template-columns:220px minmax(0,1fr);gap:28px}}.meta-c .dias b{display:block;font:700 40px/1 var(--round)}.meta-c .dias span{font-size:12px;color:var(--mu)}
 .meta-c .dias.cerca b{color:var(--late)}
 .prog{height:8px;border-radius:999px;background:var(--fill2);overflow:hidden}.prog i{display:block;height:100%;background:var(--ok);border-radius:999px;transition:width .6s var(--spring)}
 /* barra de pestañas flotante */
@@ -180,11 +208,24 @@ nav .num{position:absolute;top:3px;right:calc(50% - 22px);min-width:17px;height:
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(92px + env(safe-area-inset-bottom));z-index:70;padding:11px 18px;border-radius:999px;font-weight:600;font-size:14.5px;display:none;max-width:calc(100% - 32px);text-align:center}
 .toast.on{display:block;animation:sube .4s var(--spring)}
 pre{white-space:pre-wrap;font:inherit;margin:0;font-size:14.5px}
-.jor{border-radius:var(--r-l);padding:14px;margin-bottom:12px}
 /* botones rápidos al pasar el ratón */
-.rapidos{display:none;position:absolute;top:6px;right:6px;gap:4px;z-index:2}
-.rapidos button{width:30px;height:30px;border-radius:50%;background:var(--glass);border:1px solid var(--rim);font-size:14px;box-shadow:0 2px 8px var(--shadow)}
-@media (hover:hover){.t:hover{background:color-mix(in srgb,var(--ac) 7%,var(--fill))}.t:hover .rapidos{display:flex}.btn:hover{filter:brightness(1.06)}nav button:hover{color:var(--ink)}}
+.rapidos{display:none}
+.rapidos button{width:30px;height:30px;border-radius:50%;background:var(--fill2);border:1px solid var(--rim);font-size:14px}
+.rapidos button:hover{background:var(--fill)}
+@media (hover:hover){
+  .t{grid-template-columns:auto minmax(0,1fr) auto}
+  .t .det{grid-column:1/-1}
+  .rapidos{display:flex;gap:4px;grid-column:3;grid-row:1;opacity:0;transition:opacity .2s}
+  .t:hover .rapidos,.t:focus-within .rapidos{opacity:1}
+  .t:hover{background:color-mix(in srgb,var(--ac) 7%,var(--fill))}
+  .btn:hover{filter:brightness(1.06)}nav button:hover{color:var(--ink)}}
+/* barras de scroll integradas en el cristal */
+::-webkit-scrollbar{width:12px;height:12px}
+::-webkit-scrollbar-track{background:transparent;margin:24px 0}
+::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--ink) 16%,transparent);border-radius:999px;border:4px solid transparent;background-clip:padding-box}
+::-webkit-scrollbar-thumb:hover{background:color-mix(in srgb,var(--ink) 30%,transparent);background-clip:padding-box}
+::-webkit-scrollbar-corner{background:transparent}
+@supports not selector(::-webkit-scrollbar){*{scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--ink) 22%,transparent) transparent}}
 
 /* ---------- responsive ---------- */
 /* tablet y más: dos columnas, hojas como ventana centrada, tarjetas en cuadrícula */
@@ -193,8 +234,7 @@ pre{white-space:pre-wrap;font:inherit;margin:0;font-size:14.5px}
   .grid3{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}
   .grid3>#p-hoy-b{grid-column:1/-1}
   .grid3 .panel{margin:0}
-  #l-metas,#l-jor,.tarjetas{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px;align-items:start}
-  .meta-c,.jor{margin:0}
+  .tarjetas{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px;align-items:start}
   .velo{align-items:center}
   .hoja{border-radius:var(--r-xl);padding:22px;animation:aparece .4s var(--spring)}
 }
@@ -212,12 +252,12 @@ pre{white-space:pre-wrap;font:inherit;margin:0;font-size:14.5px}
   header{top:16px}
   .grid3{grid-template-columns:repeat(3,minmax(0,1fr))}
   .grid3>#p-hoy-b{grid-column:auto}
-  .grid3 .panel,#p-hoy-a{max-height:calc(100dvh - 166px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
-  #p-hoy-a{position:sticky;top:150px}
+  .grid3 .panel,#p-hoy-a{max-height:calc(100dvh - var(--cabh,140px) - 44px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
+  #p-hoy-a{position:sticky;top:calc(var(--cabh,140px) + 30px)}
   .grid3 .panel>.cab{position:sticky;top:-14px;z-index:3;margin:-14px -14px 10px;padding:14px 16px 10px;background:var(--glass);border-radius:var(--r-xl) var(--r-xl) 0 0;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
   #v-ban:not([hidden]){display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);column-gap:14px;align-items:start}
   #v-ban>*{grid-column:1}
-  #v-ban>#ban-avisos{grid-column:2;grid-row:1/span 4;position:sticky;top:150px;max-height:calc(100dvh - 166px);overflow-y:auto;overscroll-behavior:contain}
+  #v-ban>#ban-avisos{grid-column:2;grid-row:1/span 4;position:sticky;top:calc(var(--cabh,140px) + 30px);max-height:calc(100dvh - var(--cabh,140px) - 44px);overflow-y:auto;overscroll-behavior:contain}
   #v-ban .tarjetas{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
   #v-ban .hero{grid-template-columns:1fr}
 }
@@ -232,7 +272,10 @@ pre{white-space:pre-wrap;font:inherit;margin:0;font-size:14.5px}
 <header class="glass" id="cab">
   <div class="row"><div><h1 id="titulo">Mi jornada</h1><div class="mu" id="est">…</div></div>
     <div class="row" style="flex-wrap:nowrap"><span class="live" id="live">⏳ Procesando…</span><button class="mas" id="refr" aria-label="Actualizar">↻</button></div></div>
-  <div class="linea-wrap" id="linea-wrap" hidden><div class="linea" id="linea"></div><div class="linea-pie" id="linea-pie"></div></div>
+  <div class="linea-wrap" id="linea-wrap" hidden role="button" tabindex="0" aria-expanded="false" title="Toca para ver el horario del plan">
+    <div class="lj-txt" id="lj-a"></div><div class="linea" id="linea"></div>
+    <div class="lj-txt" id="lj-b"></div><div class="tira" id="tira"></div>
+    <div class="lj-det" id="lj-det" hidden></div></div>
 </header>
 
 <section id="v-hoy">
@@ -328,19 +371,22 @@ function chipFecha(l){if(!l)return"";const h=H(),d=Math.round((new Date(l+"T12:0
   const txt=d<0?`venció ${l.slice(8)}/${l.slice(5,7)}`:d===0?"vence hoy":d===1?"vence mañana":`${DIAS[new Date(l+"T12:00").getDay()]} ${+l.slice(8)}`;
   return`<span class="chip ${d<=0?"late":d<=2?"soon":""}">${txt}</span>`}
 const tarea=id=>T.find(t=>t.id===id);
+function tituloAuto(s){s=limpio(s||"").split(/\s*\(|\. |;| — /)[0].replace(/[ .:]+$/,"");return s.length<=60?s:s.slice(0,57).replace(/\s+\S*$/,"")+"…"}
+const tit=t=>t.titulo||tituloAuto(t.texto);
+const det=t=>t.texto&&t.texto!==tit(t)?t.texto:"";
 const abiertas=()=>T.filter(t=>t.estado!=="hecha"&&t.estado!=="cancelada");
 
 // ---------- escrituras en tareas.json ----------
 async function opTarea(id,fn,msg){await editarJSON("_sistema/tareas.json",ts=>{const t=ts.find(x=>x.id===id);if(!t)throw new Error("Esa tarea ya no existe; actualiza");fn(t)},msg,[])}
 async function setInicio(t,f){const ant=t.inicio;
-  await opTarea(t.id,x=>{if(x.inicio&&f>x.inicio&&x.inicio<=hoyReal())x.aplazada=(x.aplazada||0)+1;if(f)x.inicio=f;else delete x.inicio},`tarea: ⏳ ${f||"sin fecha"} ${t.texto.slice(0,40)}`);
+  await opTarea(t.id,x=>{if(x.inicio&&f>x.inicio&&x.inicio<=hoyReal())x.aplazada=(x.aplazada||0)+1;if(f)x.inicio=f;else delete x.inicio},`tarea: ⏳ ${f||"sin fecha"} ${tit(t).slice(0,40)}`);
   t.inicio=f||undefined;if(ant&&f>ant&&ant<=hoyReal())t.aplazada=(t.aplazada||0)+1}
-async function setHecha(t,on){await opTarea(t.id,x=>{if(on){x.estado="hecha";x.completada=hoyReal()}else{x.estado="abierta";delete x.completada}},`tarea: ${on?"hecha":"reabierta"} ${t.texto.slice(0,40)}`);
+async function setHecha(t,on){await opTarea(t.id,x=>{if(on){x.estado="hecha";x.completada=hoyReal()}else{x.estado="abierta";delete x.completada}},`tarea: ${on?"hecha":"reabierta"} ${tit(t).slice(0,40)}`);
   t.estado=on?"hecha":"abierta";t.completada=on?hoyReal():undefined;badge()}
-async function cancelar(t,motivo){await opTarea(t.id,x=>{x.estado="cancelada";x.completada=hoyReal();x.motivo=motivo},`tarea: cancelada ${t.texto.slice(0,40)}`);t.estado="cancelada"}
+async function cancelar(t,motivo){await opTarea(t.id,x=>{x.estado="cancelada";x.completada=hoyReal();x.motivo=motivo},`tarea: cancelada ${tit(t).slice(0,40)}`);t.estado="cancelada"}
 function slug(s){return s.toLowerCase().normalize("NFKD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,22)||"t"}
-async function nuevaTarea(texto,areaT,inicio){let t;await editarJSON("_sistema/tareas.json",ts=>{let id="p-"+slug(texto),n=2;while(ts.some(x=>x.id===id))id=`p-${slug(texto)}-${n++}`;
-  t={id,texto,area:areaT,estado:"abierta",prioridad:"normal",creada:hoyReal(),origen:"panel",...(inicio?{inicio}:{})};ts.push(t);ts.sort((a,b)=>a.id.localeCompare(b.id))},`tarea: nueva ${texto.slice(0,40)}`,[]);
+async function nuevaTarea(titulo,detalle,areaT,inicio){let t;await editarJSON("_sistema/tareas.json",ts=>{let id="p-"+slug(titulo),n=2;while(ts.some(x=>x.id===id))id=`p-${slug(titulo)}-${n++}`;
+  t={id,titulo,texto:detalle||titulo,area:areaT,estado:"abierta",prioridad:"normal",creada:hoyReal(),origen:"panel",...(inicio?{inicio}:{})};ts.push(t);ts.sort((a,b)=>a.id.localeCompare(b.id))},`tarea: nueva ${titulo.slice(0,40)}`,[]);
   T.push({...t,tipo:`${areaT}/tarea`});return t}
 
 // ---------- plan en bloques ----------
@@ -358,7 +404,7 @@ function fila(t,{bloque=null}={}){const li=document.createElement("li");li.datas
   const rol=bloque?`<span class="rol">${bloque.rol==="principal"?"★ Principal":"Bloque"}${bloque.min?` · ${bloque.min}′`:""}</span>`:"";
   const ap=t.aplazada>=3?`<span class="chip soon">aplazada ${t.aplazada}×</span>`:"";
   li.innerHTML=`<button class="chk" aria-label="${t.estado==="hecha"?"Desmarcar":"Marcar hecha"}"></button>
-   <div><div class="tx"><span class="dot ${t.area}" title="${t.area==="academico"?"Uni":"Personal"}"></span> ${esc(limpio(t.texto))}</div></div>
+   <div class="cont"><div class="tx"><span class="dot ${t.area}" title="${t.area==="academico"?"Uni":"Personal"}"></span> ${esc(limpio(tit(t)))}</div>${det(t)?`<div class="dt">${esc(limpio(det(t)))}</div>`:""}</div>
    <div class="meta">${rol}${chipFecha(t.estado==="hecha"?null:t.limite)}${dep}${ap}${t.pasos?`<span class="chip">${t.pasos} pasos</span>`:""}</div>
    ${bloque&&bloque.nota?`<div class="bnota">${esc(bloque.nota)}</div>`:""}
    <div class="det">${t.asig?`<div class="mu">${esc(t.asig)}${t.padre?` · paso de «${esc(limpio(t.padre).slice(0,50))}»`:""}</div>`:""}
@@ -366,7 +412,7 @@ function fila(t,{bloque=null}={}){const li=document.createElement("li");li.datas
      ${t.nota?`<div class="mu" style="margin-top:8px">${esc(limpio(t.nota))}${t.nnotas>1?` <i>(+${t.nnotas-1} notas)</i>`:""}</div>`:""}
      ${t.estado!=="hecha"?`<div class="row"><button class="btn s" data-a="foco">⏱ Foco</button><button class="btn s" data-a="trocear">✂️ Trocear</button><button class="btn s" data-a="atasco">🪨 Me atasqué</button><button class="btn s" data-a="cancelar">🗑 Quitar</button></div>`:""}</div>`;
   li.querySelector(".chk").onclick=e=>{e.stopPropagation();completar(t,li)};
-  li.querySelector(".tx").onclick=()=>li.classList.toggle("abierta-det");
+  li.querySelector(".cont").onclick=()=>li.classList.toggle("abierta-det");
   li.querySelector(".meta").onclick=()=>li.classList.toggle("abierta-det");
   const fe=li.querySelector("input[type=date]");if(fe)fe.onchange=async e=>{try{await setInicio(t,e.target.value);toast(e.target.value?`Empieza el ${e.target.value.slice(8)}/${e.target.value.slice(5,7)}`:"Sin fecha");pintarTareas()}catch(er){toast(er.message)}};
   if(t.estado!=="hecha")li.insertAdjacentHTML("beforeend",`<div class="rapidos"><button data-a="foco" title="Modo foco" aria-label="Modo foco">⏱</button><button data-a="manana" title="Pasar a mañana" aria-label="Pasar a mañana">→</button></div>`);
@@ -376,8 +422,8 @@ async function completar(t,li){const on=t.estado!=="hecha";li.classList.toggle("
   if(on){li.classList.add("sale");}try{await setHecha(t,on);toast(on?"✓ Hecha":"Reabierta");setTimeout(pintarTareas,on?380:0)}catch(e){li.classList.toggle("hecha",!on);li.classList.remove("sale");toast(e.message)}}
 async function accion(a,t){if(a==="foco")return abrirFoco(t);
   if(a==="manana"){try{await quitarDeHoySiBloque(t);await setInicio(t,sumar(H(),1));toast("→ Mañana");pintarTareas()}catch(e){toast(e.message)}return}
-  if(a==="trocear"){try{await capturar("trocear",`Trocear: ${t.texto}`,"",{id:t.id});toast("✂️ Pedido: el planificador la trocea")}catch(e){toast(e.message)}return}
-  if(a==="atasco")return hoja(`<h2>¿Qué te bloquea?</h2><p class="mu">${esc(limpio(t.texto))}</p><textarea id="h-txt" placeholder="En una línea"></textarea><div class="row" style="margin-top:12px"><button class="btn p" id="h-ok">Enviar</button><button class="btn" data-cerrar>Cancelar</button></div>`,()=>{
+  if(a==="trocear"){try{await capturar("trocear",`Trocear: ${tit(t)}${det(t)?" — "+det(t):""}`,"",{id:t.id});toast("✂️ Pedido: el planificador la trocea")}catch(e){toast(e.message)}return}
+  if(a==="atasco")return hoja(`<h2>¿Qué te bloquea?</h2><p class="mu">${esc(limpio(tit(t)))}</p><textarea id="h-txt" placeholder="En una línea"></textarea><div class="row" style="margin-top:12px"><button class="btn p" id="h-ok">Enviar</button><button class="btn" data-cerrar>Cancelar</button></div>`,()=>{
     $("#h-ok").onclick=async()=>{const v=$("#h-txt").value.trim();if(!v)return;try{await capturar("atasco",v,"",{id:t.id});cerrarHoja();toast("🪨 Enviado")}catch(e){toast(e.message)}}});
   if(a==="cancelar"){if(!confirm("¿Quitar esta tarea? Queda como cancelada, no se borra."))return;try{await cancelar(t,"quitada desde el panel");if(bloques().some(b=>b.id===t.id))await guardarPlan(bloques().map(b=>b.id).filter(i=>i!==t.id));pintarTareas();toast("Quitada")}catch(e){toast(e.message)}}}
 
@@ -416,20 +462,30 @@ async function soltar(ev){const id=ev.item.dataset.id,t=tarea(id),de=ev.from.dat
       if(cubo(t)!==a)await setInicio(t,f);toast(a==="hoy"?"Para hoy":a==="semana"?"A esta semana":"A próximamente")}}
   catch(e){toast(e.message)}pintarTareas()}
 function pintarTareas(){$("#p-hoy-a")&&pintarPanel($("#p-hoy-a"),"hoy");pintarPanel($("#p-hoy-b"),"hoy");pintarPanel($("#p-semana"),"semana");pintarPanel($("#p-prox"),"proximamente");linea();badge()}
-function altaRapida(c){hoja(`<h2>Nueva tarea · ${TIT[c]}</h2><input type="text" id="h-txt" placeholder="Qué hay que hacer"><div class="seg" id="h-area" style="margin-top:10px"><button data-a="academico" class="on">🎓 Uni</button><button data-a="personal">🌱 Personal</button></div><div class="row"><button class="btn p" id="h-ok">Añadir</button><button class="btn" data-cerrar>Cancelar</button></div>`,()=>{
+function altaRapida(c){hoja(`<h2>Nueva tarea · ${TIT[c]}</h2><input type="text" id="h-txt" placeholder="Título: qué hay que hacer" maxlength="80"><textarea id="h-det" placeholder="Detalle (opcional)" style="margin-top:8px;min-height:60px"></textarea><div class="seg" id="h-area" style="margin-top:10px"><button data-a="academico" class="on">🎓 Uni</button><button data-a="personal">🌱 Personal</button></div><div class="row"><button class="btn p" id="h-ok">Añadir</button><button class="btn" data-cerrar>Cancelar</button></div>`,()=>{
   let ar="academico";$$("#h-area button").forEach(b=>b.onclick=()=>{ar=b.dataset.a;$$("#h-area button").forEach(x=>x.classList.toggle("on",x===b))});
-  const ok=async()=>{const v=$("#h-txt").value.trim();if(!v)return;$("#h-ok").disabled=true;try{await nuevaTarea(v,ar,{hoy:H(),semana:sumar(H(),1),proximamente:null}[c]);cerrarHoja();pintarTareas();toast("➕ Añadida")}catch(e){$("#h-ok").disabled=false;toast(e.message)}};
+  const ok=async()=>{const v=$("#h-txt").value.trim();if(!v)return;$("#h-ok").disabled=true;try{await nuevaTarea(v,$("#h-det").value.trim(),ar,{hoy:H(),semana:sumar(H(),1),proximamente:null}[c]);cerrarHoja();pintarTareas();toast("➕ Añadida")}catch(e){$("#h-ok").disabled=false;toast(e.message)}};
   $("#h-ok").onclick=ok;$("#h-txt").onkeydown=e=>{if(e.key==="Enter")ok()};setTimeout(()=>$("#h-txt").focus(),200)})}
 
 // ---------- línea de la jornada ----------
-function minutos(b,t){if(b&&b.min)return b.min;const m=(t&&t.texto||"").match(/(\d{1,3})\s*[′']/);if(m)return+m[1];return(t&&panel.foco&&panel.foco[t.tipo])||25}
+function minutos(b,t){if(b&&b.min)return b.min;const m=(t?tit(t)+" "+(t.texto||""):"").match(/(\d{1,3})\s*[′']/);if(m)return+m[1];return(t&&panel.foco&&panel.foco[t.tipo])||25}
+const hm=d=>d.toTimeString().slice(0,5);
+const dur=m=>{m=Math.max(0,Math.round(m));const h=Math.floor(m/60),r=m%60;return h?`${h} h${r?` ${r}′`:""}`:`${r}′`};
 function linea(){const j=panel&&panel.jornada_actual,w=$("#linea-wrap");if(!j){w.hidden=true;return}w.hidden=false;
   const ini=new Date(j.inicio),fh=(panel.ritmo&&panel.ritmo.fin_habitual)||"07:00";let fin=new Date(ini);const[hh,mm]=fh.split(":").map(Number);fin.setHours(hh,mm,0,0);if(fin<=ini)fin.setDate(fin.getDate()+1);
-  const tot=(fin-ini)/6e4,ahora=Math.min(tot,Math.max(0,(Date.now()-ini)/6e4)),pend=bloques().map(b=>[b,tarea(b.id)]).filter(([b,t])=>t&&t.estado!=="hecha");
-  let x=ahora,h="";pend.forEach(([b,t])=>{const m=minutos(b,t),w0=Math.max(0,Math.min(m,tot-x));if(w0>0)h+=`<i class="${t.area}" style="left:${x/tot*100}%;width:${w0/tot*100}%" title="${esc(t.texto)}"></i>`;x+=m});
-  $("#linea").innerHTML=`<div class="ya" style="width:${ahora/tot*100}%"></div>${h}<div class="ahora" style="left:${ahora/tot*100}%"></div>`;
-  const sobra=Math.round(x-tot),hm=d=>d.toTimeString().slice(0,5);
-  $("#linea-pie").innerHTML=`<span>${hm(ini)}</span>${sobra>0?`<b>Sobran ${sobra}′ de plan</b>`:`<span>${pend.length?`${Math.round(x-ahora)}′ de plan · ${Math.round(tot-x)}′ libres`:"Sin bloques pendientes"}</span>`}<span>${fh}</span>`;
+  const tot=(fin-ini)/6e4,lleva=(Date.now()-ini)/6e4,ahora=Math.min(tot,Math.max(0,lleva)),quedan=tot-lleva;
+  $("#lj-a").innerHTML=`<span>Llevas <b>${dur(lleva)}</b></span><span>${quedan>0?`quedan <b>${dur(quedan)}</b> · fin habitual ${fh}`:`pasado tu fin habitual (${fh})`}</span>`;
+  $("#linea").innerHTML=`<div class="ya" style="width:${ahora/tot*100}%"></div><div class="ahora" style="left:${ahora/tot*100}%"></div>`;
+  const bs=bloques().map(b=>[b,tarea(b.id)]).filter(([b,t])=>t),pend=bs.filter(([b,t])=>t.estado!=="hecha"),hechos=bs.length-pend.length;
+  const minPend=pend.reduce((a,[b,t])=>a+minutos(b,t),0),acaba=new Date(Date.now()+minPend*6e4),sobra=Math.round(minPend-Math.max(0,quedan));
+  const primero=pend[0]&&pend[0][1].id;
+  $("#tira").innerHTML=bs.map(([b,t])=>`<i class="${t.area} ${t.estado==="hecha"?"hecho":""} ${t.id===primero?"toca":""}" style="flex-grow:${minutos(b,t)}" title="${esc(tit(t))} · ${minutos(b,t)}′"></i>`).join("");
+  $("#tira").hidden=!bs.length;
+  $("#lj-b").innerHTML=bs.length?`<span>Plan <b>${hechos}/${bs.length}</b> · ${pend.length?`${dur(minPend)} pendientes · acabas ~<b>${hm(acaba)}</b>`:"todo hecho"}</span>${sobra>0?`<b class="mal">sobran ${dur(sobra)}</b>`:`<span class="pista">Ver horario ${$("#lj-det").hidden?"▾":"▴"}</span>`}`
+    :`<span>Sin plan todavía: arrastra tareas al plan de Hoy</span>`;
+  let t0=Date.now();$("#lj-det").innerHTML=bs.length?`<ol>${bs.map(([b,t])=>{const m=minutos(b,t);if(t.estado==="hecha")return`<li class="hecho"><span>hecho</span><b>${esc(tit(t))}</b><span>${m}′</span></li>`;
+      const a=new Date(t0);t0+=m*6e4;return`<li class="${t.id===primero?"toca":""}"><span>${hm(a)}–${hm(new Date(t0))}</span><b>${esc(tit(t))}</b><span>${m}′</span></li>`}).join("")}</ol>
+      <p class="nota-lj">La barra de arriba es tu jornada, de ${hm(ini)} a ${fh}, rellena hasta ahora. La de abajo es el plan: un tramo por bloque, del tamaño de su duración. El horario empieza ahora y encadena los bloques pendientes.</p>`:"";
   cielo(ahora/tot)}
 function cielo(p){// anochecer violeta → medianoche índigo → amanecer ámbar
   const lerp=(a,b,k)=>a+(b-a)*k,k=Math.min(1,Math.max(0,p)),r=$(":root").style;
@@ -441,7 +497,7 @@ function badge(){const n=abiertas().filter(t=>cubo(t)==="hoy").length;try{naviga
 // ---------- modo foco ----------
 let foco=null;
 function abrirFoco(t){const b=bloques().find(x=>x.id===t.id);let m=minutos(b,t);
-  const pinta=()=>{$("#foco-in").innerHTML=`<div class="mu">${t.area==="academico"?"🎓":"🌱"} ${esc(t.asig||"")}</div><div class="que">${esc(limpio(t.texto))}</div>
+  const pinta=()=>{$("#foco-in").innerHTML=`<div class="mu">${t.area==="academico"?"🎓":"🌱"} ${esc(t.asig||"")}</div><div class="que">${esc(limpio(tit(t)))}</div>${det(t)?`<div class="mu fdet">${esc(limpio(det(t)))}</div>`:""}
     <div class="reloj"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="54" fill="none" stroke="var(--fill2)" stroke-width="8"/></svg><div class="num">${m}′</div></div>
     <div class="row"><button class="btn" id="f-m">−5</button><button class="btn p" id="f-go">Empezar ${m}′</button><button class="btn" id="f-p">+5</button></div>
     <div class="row"><button class="btn s" id="f-x">Cerrar</button></div><p class="mu" style="max-width:420px">Duración estimada para esta tarea${b&&b.min?" por el planificador":panel.foco&&panel.foco[t.tipo]?" con tus tiempos reales":""}.</p>`;
@@ -449,14 +505,14 @@ function abrirFoco(t){const b=bloques().find(x=>x.id===t.id);let m=minutos(b,t);
   $("#foco").classList.add("on");const g=st.get("foco");if(g){try{const f=JSON.parse(g);if(f.id===t.id)return correr(t,f)}catch{}}pinta()}
 function arrancar(t,est,dur){const f={id:t.id,est,dur,ini:Date.now()};st.set("foco",JSON.stringify(f));correr(t,f)}
 function correr(t,f){foco={t,f};$("#foco").classList.add("on");
-  $("#foco-in").innerHTML=`<div class="que">${esc(limpio(t.texto))}</div><div class="reloj"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="54" fill="none" stroke="var(--fill2)" stroke-width="8"/><circle id="f-arc" cx="60" cy="60" r="54" fill="none" stroke="var(--ac)" stroke-width="8" stroke-linecap="round" stroke-dasharray="339.3" stroke-dashoffset="0"/></svg><div class="num" id="f-num"></div></div>
+  $("#foco-in").innerHTML=`<div class="que">${esc(limpio(tit(t)))}</div>${det(t)?`<div class="mu fdet">${esc(limpio(det(t)))}</div>`:""}<div class="reloj"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="54" fill="none" stroke="var(--fill2)" stroke-width="8"/><circle id="f-arc" cx="60" cy="60" r="54" fill="none" stroke="var(--ac)" stroke-width="8" stroke-linecap="round" stroke-dasharray="339.3" stroke-dashoffset="0"/></svg><div class="num" id="f-num"></div></div>
    <div class="row"><button class="btn" id="f-fin">Terminar ya</button><button class="btn s" id="f-min">Minimizar</button></div>`;
   $("#f-fin").onclick=()=>preguntaFin();$("#f-min").onclick=()=>{$("#foco").classList.remove("on")};tic()}
 function tic(){if(!foco)return;const{f}=foco,pas=(Date.now()-f.ini)/1e3,rest=Math.max(0,f.dur*60-pas),n=$("#f-num");
   if(n){n.textContent=`${Math.floor(rest/60)}:${String(Math.floor(rest%60)).padStart(2,"0")}`;$("#f-arc").setAttribute("stroke-dashoffset",339.3*(1-rest/(f.dur*60)))}
   if(rest<=0){try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch{}$("#foco").classList.add("on");return preguntaFin()}setTimeout(tic,500)}
 function preguntaFin(){const{t,f}=foco,real=Math.max(1,Math.round((Date.now()-f.ini)/6e4));
-  $("#foco-in").innerHTML=`<div class="que">${esc(limpio(t.texto))}</div><p class="mu">Llevas ${real}′ (estimado ${f.est}′)</p>
+  $("#foco-in").innerHTML=`<div class="que">${esc(limpio(tit(t)))}</div>${det(t)?`<div class="mu fdet">${esc(limpio(det(t)))}</div>`:""}<p class="mu">Llevas ${real}′ (estimado ${f.est}′)</p>
    <div class="row"><button class="btn p" id="f-ok">✅ Hecha</button><button class="btn" id="f-10">➕ 10′ más</button><button class="btn" id="f-dej">⏸ La dejo</button></div>`;
   const reg=async()=>{try{await editarJSON("_sistema/foco.json",rs=>{rs.push({id:t.id,asig:t.asig||"",tipo:t.tipo||"",estimado:f.est,real,fecha:hoyReal()})},"foco: tiempo real",[])}catch(e){toast(e.message)}};
   $("#f-ok").onclick=async()=>{cerrarFoco();await reg();try{await setHecha(t,true);toast("✓ Hecha en "+real+"′");pintarTareas()}catch(e){toast(e.message)}};
@@ -469,12 +525,12 @@ const porRepasar=()=>abiertas().filter(t=>cubo(t)==="proximamente"||(t.aplazada|
 function abrirRepaso(){const cola=porRepasar();if(!cola.length)return toast("Nada que repasar");let i=0;$("#repaso").classList.add("on");
   const sig=()=>{if(i>=cola.length){$("#repaso").classList.remove("on");pintarTareas();return toast("Repaso hecho")}const t=cola[i];
     $("#repaso-in").innerHTML=`<div class="mu" style="margin-bottom:10px">${i+1} de ${cola.length}</div><div class="carta glass" id="carta"><span class="dot ${t.area}"></span> <span class="mu">${esc(t.asig||(t.area==="personal"?"Personal":""))}</span>
-      <div class="tx">${esc(limpio(t.texto))}</div><div class="row">${chipFecha(t.limite)||(t.limite?`<span class="chip">límite ${t.limite.slice(8)}/${t.limite.slice(5,7)}</span>`:"")}${t.aplazada?`<span class="chip soon">aplazada ${t.aplazada}×</span>`:""}</div>
+      <div class="tx">${esc(limpio(tit(t)))}</div>${det(t)?`<div class="mu" style="font-size:14.5px">${esc(limpio(det(t)))}</div>`:""}<div class="row">${chipFecha(t.limite)||(t.limite?`<span class="chip">límite ${t.limite.slice(8)}/${t.limite.slice(5,7)}</span>`:"")}${t.aplazada?`<span class="chip soon">aplazada ${t.aplazada}×</span>`:""}</div>
       ${t.nota?`<p class="mu" style="font-size:14px">${esc(limpio(t.nota))}</p>`:""}</div>
       <div class="row" style="margin-top:16px"><button class="btn" data-r="mant">Mantener</button><button class="btn p" data-r="sem">Esta semana</button><button class="btn" data-r="tro">✂️ Trocear</button><button class="btn" data-r="can">🗑 Quitar</button></div>
       <div class="row"><button class="btn s" data-r="fin">Terminar</button></div><p class="mu">Desliza → esta semana · ← mantener</p>`;
     const go=async r=>{const c=$("#carta");c.style.transform=r==="sem"?"translateX(120%) rotate(8deg)":r==="mant"?"translateX(-120%) rotate(-8deg)":"scale(.9)";c.style.opacity=0;
-      try{if(r==="sem")await setInicio(t,sumar(H(),1));if(r==="tro")await capturar("trocear",`Trocear: ${t.texto}`,"",{id:t.id});if(r==="can")await cancelar(t,"descartada en el repaso");}catch(e){toast(e.message)}
+      try{if(r==="sem")await setInicio(t,sumar(H(),1));if(r==="tro")await capturar("trocear",`Trocear: ${tit(t)}${det(t)?" — "+det(t):""}`,"",{id:t.id});if(r==="can")await cancelar(t,"descartada en el repaso");}catch(e){toast(e.message)}
       if(r==="fin")i=cola.length;else i++;setTimeout(sig,220)};
     $$("#repaso-in [data-r]").forEach(b=>b.onclick=()=>go(b.dataset.r));
     const c=$("#carta");let x0=null;c.onpointerdown=e=>{x0=e.clientX};c.onpointermove=e=>{if(x0!==null)c.style.transform=`translateX(${e.clientX-x0}px) rotate(${(e.clientX-x0)/30}deg)`};
@@ -503,7 +559,7 @@ function pintarBandeja(){const co=panel.correo||{},rem=co.remitentes||[];
   const tareasDe=r=>(r.tareas||[]).map(tarea).filter(Boolean),abiertasCo=rem.flatMap(tareasDe).filter(t=>t.estado==="abierta");
   const sig=abiertasCo.slice().sort(orden)[0],cuenta={};rem.forEach(r=>cuenta[r.categoria]=(cuenta[r.categoria]||0)+1);const tot=rem.length||1;
   $("#ban-hero").innerHTML=`<div class="hero"><div><div class="big">${abiertasCo.length}</div><div class="mu">${abiertasCo.length===1?"tarea abierta":"tareas abiertas"} en tus correos sin leer</div>
-     ${sig?`<div class="sig">${esc(limpio(sig.texto))}</div><div class="mu">${esc(sig.asig||"")}${sig.limite?` · límite ${sig.limite.slice(8)}/${sig.limite.slice(5,7)}`:""}</div>`:""}</div>
+     ${sig?`<div class="sig">${esc(limpio(tit(sig)))}</div><div class="mu">${esc(sig.asig||"")}${sig.limite?` · límite ${sig.limite.slice(8)}/${sig.limite.slice(5,7)}`:""}</div>`:""}</div>
     <div><div class="stats"><div><b>${co.no_leidos??rem.reduce((a,r)=>a+(r.hilos||[]).length,0)}</b><span>sin leer</span></div><div><b>${rem.length}</b><span>remitentes</span></div><div><b>${cuenta.pide||0}</b><span>te piden algo</span></div></div>
      <div class="barra">${["pide","leer","info","ruido"].map(k=>`<i style="width:${(cuenta[k]||0)/tot*100}%;background:var(--${k==="ruido"?"info":k});opacity:${k==="ruido"?.45:1}"></i>`).join("")}</div>
      <div class="ley">${["pide","leer","info","ruido"].map(k=>`<span><i style="background:var(--${k==="ruido"?"info":k});opacity:${k==="ruido"?.45:1}"></i>${CAT[k]} · ${cuenta[k]||0}</span>`).join("")}</div>
@@ -523,7 +579,7 @@ function pintarBandeja(){const co=panel.correo||{},rem=co.remitentes||[];
   const q=st.get("banq");$("#ban-q").value=q;$("#ban-q").oninput=e=>{st.set("banq",e.target.value);tarjetas()};tarjetas();
   function tarjetas(){const q=($("#ban-q").value||"").toLowerCase(),el=$("#ban-tarjetas");el.innerHTML="";
     const vis=rem.filter(r=>filtroBan==="todos"||(filtroBan==="pide"?(r.categoria==="pide"||tareasDe(r).length):filtroBan==="leer"?r.categoria==="leer":["info","ruido"].includes(r.categoria)))
-      .filter(r=>!q||(r.nombre+" "+r.email+" "+r.resumen+" "+tareasDe(r).map(t=>t.texto).join(" ")).toLowerCase().includes(q));
+      .filter(r=>!q||(r.nombre+" "+r.email+" "+r.resumen+" "+tareasDe(r).map(t=>tit(t)+" "+(t.texto||"")).join(" ")).toLowerCase().includes(q));
     if(!vis.length)el.innerHTML=`<div class="vacio">${rem.length?"Nada en este filtro":"Sin correos sin leer"}</div>`;
     vis.forEach(r=>{const c=document.createElement("div");c.className=`rem glass ${r.categoria}`;const n=(r.hilos||[]).length;
       c.innerHTML=`<div class="top"><div><h3>${esc(r.nombre)}</h3><div class="em">${esc(r.email||"")} · ${n} ${n===1?"correo":"correos"}</div></div><span class="badge ${r.categoria}">${CAT[r.categoria]||r.categoria}</span></div><div class="res">${esc(r.resumen||"")}</div>`;
@@ -536,12 +592,21 @@ function pintarBandeja(){const co=panel.correo||{},rem=co.remitentes||[];
 // ---------- metas ----------
 function pintarMetas(){const ms=panel.metas||[];$("#l-metas").innerHTML=ms.length?ms.map(m=>{const p=m.total?Math.round(m.hechas/m.total*100):0;
   return`<div class="meta-c glass"><div class="dias ${m.dias<=7?"cerca":""}"><b>${m.dias}</b><span>${m.dias===1?"día":"días"}</span></div>
-   <div><b>${esc(m.asig)}</b> <span class="mu">· ${m.tipo} el ${m.fecha.slice(8)}/${m.fecha.slice(5,7)}</span></div>
-   <div class="mu" style="font-size:14px">${esc(limpio(m.texto)).slice(0,140)}</div>
-   <div>${m.total?`<div class="prog"><i style="width:${p}%"></i></div><div class="mu" style="font-size:13px;margin-top:4px">${m.hechas} de ${m.total} tareas hechas${m.siguiente?` · siguiente: ${esc(limpio(m.siguiente)).slice(0,70)}`:""}</div>`:`<div class="mu" style="font-size:13px">Aún sin tareas: el planificador las crea al acercarse</div>`}</div></div>`}).join(""):'<div class="vacio">Sin exámenes ni entregas en los próximos 60 días</div>'}
+   <div class="mc-info"><div class="mc-tit"><b>${esc(m.asig)}</b> <span class="mu">· ${m.tipo} el ${m.fecha.slice(8)}/${m.fecha.slice(5,7)}</span></div><div class="mc-desc">${esc(limpio(m.texto))}</div></div>
+   <div class="mc-prog">${m.total?`<div class="prog"><i style="width:${p}%"></i></div><div class="mc-num"><span><b>${m.hechas} de ${m.total}</b> tareas hechas</span><span>${p}%</span></div>${m.siguiente?`<div class="mc-sig">Siguiente: ${esc(limpio(m.siguiente))}</div>`:""}`:`<div class="mc-sig">Aún sin tareas: el planificador las crea al acercarse</div>`}</div></div>`}).join(""):'<div class="vacio">Sin exámenes ni entregas en los próximos 60 días</div>'}
 
 // ---------- jornadas ----------
-function pintarJornadas(){$("#l-jor").innerHTML=(panel.jornadas||[]).map(x=>`<div class="jor glass"><h2 style="font-size:16px">${x.nota.replace("J-","")} <span class="mu">${x.inicio?x.inicio.slice(11,16):""}–${x.fin?x.fin.slice(11,16):"…"} ${x.hechas?`· ${x.hechas}/${x.planificadas} hechas`:""}</span></h2><pre style="margin-top:8px">${esc(limpio(x.resumen||x.plan||"(sin resumen todavía)"))}</pre></div>`).join("")||'<div class="vacio">Aún no hay jornadas</div>'}
+function mdLigero(t){return String(t||"").split("\n").map(l=>l.replace(/^\s*>\s?/,"").replace(/^\s*[-*]\s+/,"• ")
+    .replace(/\*\*([^*]+)\*\*/g,"$1").replace(/`([^`]+)`/g,"$1").replace(/\s*·?\s*🆔\s*[\w.-]+/g,"").replace(/(🔺|🔼|🔽|⏫)\s*/gu,"")).join("\n").replace(/\n{3,}/g,"\n\n").trim()}
+function pintarJornadas(){const DS=["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
+  $("#l-jor").innerHTML=(panel.jornadas||[]).map(x=>{const f=x.nota.match(/(\d{4})-(\d{2})-(\d{2})/),d=f?new Date(`${f[1]}-${f[2]}-${f[3]}T12:00`):null;
+    const h=x.inicio&&x.fin?(new Date(x.fin)-new Date(x.inicio))/36e5:null,he=+x.hechas||0,pl=+x.planificadas||0,txt=mdLigero(limpio(x.resumen||x.plan||""));
+    return`<article class="jor glass"><div class="jor-meta"><b>${d?`${DS[d.getDay()]} ${+f[3]}/${f[2]}`:esc(x.nota)}</b>
+      <span class="mu">${x.inicio?x.inicio.slice(11,16):""}–${x.fin?x.fin.slice(11,16):"en curso"}${h?` · ${h.toFixed(1).replace(".",",")} h`:""}</span>
+      ${pl?`<div class="prog"><i style="width:${Math.round(he/pl*100)}%"></i></div><span class="mu">${he} de ${pl} hechas</span>`:""}</div>
+      <div class="jor-txt"><div class="jor-tipo mu">${x.resumen?"Resumen":"Plan"}</div><pre class="clamp">${esc(txt||"(sin resumen todavía)")}</pre><button class="btn s ver" hidden>Ver más</button></div></article>`}).join("")||'<div class="vacio">Aún no hay jornadas</div>';
+  $$("#l-jor .jor").forEach(j=>{const pre=j.querySelector("pre"),b=j.querySelector(".ver");requestAnimationFrame(()=>{if(pre.scrollHeight>pre.clientHeight+4)b.hidden=false});
+    b.onclick=()=>{const on=pre.classList.toggle("clamp");b.textContent=on?"Ver más":"Ver menos"}})}
 
 // ---------- pintar todo ----------
 function aplanar(p){const out=[],v=new Set();for(const src of [p.paneles||{},p.completadas||{}])for(const k in src)for(const t of src[k])if(!v.has(t.id)){v.add(t.id);out.push({...t})}return out}
@@ -596,13 +661,17 @@ $$("#area button").forEach(b=>b.onclick=()=>{area=b.dataset.a;$$("#area button")
 // ---------- navegación ----------
 function irA(v){$$("nav button").forEach(x=>x.classList.toggle("on",x.dataset.v===v));$$("section").forEach(s=>s.hidden=s.id!=="v-"+v);st.set("vista",v);gota();window.scrollTo({top:0})}
 const riel=matchMedia("(min-width:1024px)");
+try{new ResizeObserver(([e])=>document.documentElement.style.setProperty("--cabh",Math.round(e.target.getBoundingClientRect().height)+"px")).observe($("#cab"))}catch{}
 function gota(){const b=$("nav button.on");if(!b)return;const g=$("#gota");
   if(riel.matches){g.style.left=g.style.width="";g.style.top=b.offsetTop+"px";g.style.height=b.offsetHeight+"px";g.style.bottom="auto"}
   else{g.style.top=g.style.height=g.style.bottom="";g.style.left=b.offsetLeft+"px";g.style.width=b.offsetWidth+"px"}}
 addEventListener("keydown",e=>{if(e.key!=="Escape")return;cerrarHoja();$("#repaso").classList.remove("on");$("#foco").classList.remove("on")});
 riel.addEventListener("change",gota);
 $$("nav button").forEach(b=>b.onclick=()=>irA(b.dataset.v));addEventListener("resize",gota);
-$("#refr").onclick=cargar;setInterval(()=>panel&&linea(),6e4);
+$("#refr").onclick=cargar;
+$("#linea-wrap").onclick=e=>{if(e.target.closest("#lj-det"))return;const d=$("#lj-det"),w=$("#linea-wrap");d.hidden=!d.hidden;w.setAttribute("aria-expanded",String(!d.hidden));linea()};
+addEventListener("click",e=>{if(e.target.isConnected&&!e.target.closest("#linea-wrap")&&!$("#lj-det").hidden){$("#lj-det").hidden=true;$("#linea-wrap").setAttribute("aria-expanded","false");linea()}});
+$("#linea-wrap").onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();$("#linea-wrap").click()}};setInterval(()=>panel&&linea(),6e4);
 $("#c-own").value=cfg().own;$("#c-rep").value=cfg().rep;$("#c-tok").value=cfg().tok;$("#c-groq").value=st.get("groq");$("#c-gmod").value=st.get("groqModel");
 $("#c-save").onclick=()=>{st.set("own",$("#c-own").value.trim());st.set("rep",$("#c-rep").value.trim());st.set("tok",$("#c-tok").value.trim());st.set("groq",$("#c-groq").value.trim());st.set("groqModel",$("#c-gmod").value.trim());toast("Guardado");cargar()};
 

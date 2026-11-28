@@ -30,7 +30,8 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{background:var(--bg)}
 body{margin:0;min-height:100vh;color:var(--ink);font:16px/1.42 -apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;
-  padding:calc(env(safe-area-inset-top) + 8px) 16px calc(110px + env(safe-area-inset-bottom));background:var(--bg);overflow-x:hidden}
+  padding:calc(env(safe-area-inset-top) + 8px) 16px calc(110px + env(safe-area-inset-bottom));background:transparent;overflow-x:hidden}
+main{max-width:1440px;margin:0 auto}
 /* El cielo de la jornada: tres luces que cambian de tono del anochecer al amanecer */
 .cielo{position:fixed;inset:-20%;z-index:-1;pointer-events:none;transition:filter 2s;
   background:
@@ -75,8 +76,6 @@ section[hidden]{display:none}
 .panel>.cab .n{font:600 14px var(--round);color:var(--mu);margin-left:6px}
 .mas{width:34px;height:34px;border-radius:50%;font-size:22px;line-height:1;background:var(--fill);border:1px solid var(--rim);box-shadow:inset 0 1px 0 var(--spec)}
 .grid3{display:grid;gap:14px}
-@media (min-width:900px){body{max-width:1280px;margin:0 auto}.grid3{grid-template-columns:repeat(3,1fr);align-items:start}.grid3 .panel{margin:0}
-  .dos{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}}
 /* filas de tarea: lámina translúcida sin blur (rendimiento) */
 .lista{list-style:none;margin:0;padding:0;min-height:44px;display:flex;flex-direction:column;gap:7px}
 .t{position:relative;border-radius:var(--r-m);background:var(--fill);border:1px solid var(--rim);box-shadow:inset 0 1px 0 var(--spec);
@@ -135,7 +134,7 @@ textarea{min-height:84px;resize:vertical}
 @media (min-width:700px){.hero{grid-template-columns:1fr 1.3fr;align-items:center}}
 .filtros{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 12px}
 .filtros button.on{background:var(--ink);color:var(--bg)}
-.tarjetas{display:grid;gap:12px}@media (min-width:900px){.tarjetas{grid-template-columns:1fr 1fr}}
+.tarjetas{display:grid;gap:12px}
 .rem{border-radius:var(--r-l);padding:14px}
 .rem.pide{box-shadow:inset 0 1px 0 var(--spec),inset 3px 0 0 var(--pide),0 10px 34px var(--shadow)}
 .rem .top{display:flex;justify-content:space-between;gap:8px;align-items:start}
@@ -182,12 +181,54 @@ nav .num{position:absolute;top:3px;right:calc(50% - 22px);min-width:17px;height:
 .toast.on{display:block;animation:sube .4s var(--spring)}
 pre{white-space:pre-wrap;font:inherit;margin:0;font-size:14.5px}
 .jor{border-radius:var(--r-l);padding:14px;margin-bottom:12px}
+/* botones rápidos al pasar el ratón */
+.rapidos{display:none;position:absolute;top:6px;right:6px;gap:4px;z-index:2}
+.rapidos button{width:30px;height:30px;border-radius:50%;background:var(--glass);border:1px solid var(--rim);font-size:14px;box-shadow:0 2px 8px var(--shadow)}
+@media (hover:hover){.t:hover{background:color-mix(in srgb,var(--ac) 7%,var(--fill))}.t:hover .rapidos{display:flex}.btn:hover{filter:brightness(1.06)}nav button:hover{color:var(--ink)}}
+
+/* ---------- responsive ---------- */
+/* tablet y más: dos columnas, hojas como ventana centrada, tarjetas en cuadrícula */
+@media (min-width:700px){
+  .dos{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:14px;align-items:start}
+  .grid3{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}
+  .grid3>#p-hoy-b{grid-column:1/-1}
+  .grid3 .panel{margin:0}
+  #l-metas,#l-jor,.tarjetas{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px;align-items:start}
+  .meta-c,.jor{margin:0}
+  .velo{align-items:center}
+  .hoja{border-radius:var(--r-xl);padding:22px;animation:aparece .4s var(--spring)}
+}
+@keyframes aparece{from{transform:scale(.92);opacity:0}}
+#v-cfg .panel{max-width:620px}
+/* ordenador: riel lateral, tres columnas de la altura de la ventana con scroll propio */
+@media (min-width:1024px){
+  body{padding:16px 24px 24px calc(124px + env(safe-area-inset-left))}
+  nav{left:14px;top:14px;bottom:14px;transform:none;width:96px;flex-direction:column;border-radius:var(--r-xl);padding:8px;gap:4px;justify-content:flex-start}
+  nav button{flex:0 0 auto;padding:12px 4px 10px;border-radius:var(--r-l);font-size:12px;gap:3px}
+  nav button span{font-size:22px}
+  nav .gota{left:8px;right:8px;transition:top .45s var(--spring),height .45s var(--spring)}
+  nav .num{right:16px;top:6px}
+  .toast{bottom:24px;left:calc(50% + 62px)}
+  header{top:16px}
+  .grid3{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .grid3>#p-hoy-b{grid-column:auto}
+  .grid3 .panel,#p-hoy-a{max-height:calc(100dvh - 166px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
+  #p-hoy-a{position:sticky;top:150px}
+  .grid3 .panel>.cab{position:sticky;top:-14px;z-index:3;margin:-14px -14px 10px;padding:14px 16px 10px;background:var(--glass);border-radius:var(--r-xl) var(--r-xl) 0 0;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
+  #v-ban:not([hidden]){display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);column-gap:14px;align-items:start}
+  #v-ban>*{grid-column:1}
+  #v-ban>#ban-avisos{grid-column:2;grid-row:1/span 4;position:sticky;top:150px;max-height:calc(100dvh - 166px);overflow-y:auto;overscroll-behavior:contain}
+  #v-ban .tarjetas{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+  #v-ban .hero{grid-template-columns:1fr}
+}
+@media (min-width:1400px){#v-ban .hero{grid-template-columns:1fr 1.3fr}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
 <div class="cielo" aria-hidden="true"></div>
 
+<main>
 <header class="glass" id="cab">
   <div class="row"><div><h1 id="titulo">Mi jornada</h1><div class="mu" id="est">…</div></div>
     <div class="row" style="flex-wrap:nowrap"><span class="live" id="live">⏳ Procesando…</span><button class="mas" id="refr" aria-label="Actualizar">↻</button></div></div>
@@ -237,6 +278,7 @@ pre{white-space:pre-wrap;font:inherit;margin:0;font-size:14.5px}
   <label>Clave de Groq (voz)<input type="password" id="c-groq" autocomplete="off"></label><br><br>
   <label>Modelo de limpieza (opcional)<input type="text" id="c-gmod" placeholder="llama-3.3-70b-versatile"></label><br><br>
   <button class="btn p" id="c-save">Guardar</button></div></section>
+</main>
 
 <nav class="glass" id="nav"><div class="gota" id="gota"></div>
   <button data-v="hoy" class="on"><span>☀︎</span>Hoy</button><button data-v="tar"><span>☰</span>Tareas</button><button data-v="ban"><span>✉︎</span>Bandeja</button><button data-v="metas"><span>◎</span>Metas</button><button data-v="jor"><span>☾</span>Jornadas</button><button data-v="cfg"><span>⚙︎</span>Ajustes</button></nav>
@@ -327,11 +369,13 @@ function fila(t,{bloque=null}={}){const li=document.createElement("li");li.datas
   li.querySelector(".tx").onclick=()=>li.classList.toggle("abierta-det");
   li.querySelector(".meta").onclick=()=>li.classList.toggle("abierta-det");
   const fe=li.querySelector("input[type=date]");if(fe)fe.onchange=async e=>{try{await setInicio(t,e.target.value);toast(e.target.value?`Empieza el ${e.target.value.slice(8)}/${e.target.value.slice(5,7)}`:"Sin fecha");pintarTareas()}catch(er){toast(er.message)}};
-  li.querySelectorAll("[data-a]").forEach(b=>b.onclick=()=>accion(b.dataset.a,t));
+  if(t.estado!=="hecha")li.insertAdjacentHTML("beforeend",`<div class="rapidos"><button data-a="foco" title="Modo foco" aria-label="Modo foco">⏱</button><button data-a="manana" title="Pasar a mañana" aria-label="Pasar a mañana">→</button></div>`);
+  li.querySelectorAll("[data-a]").forEach(b=>b.onclick=e=>{e.stopPropagation();accion(b.dataset.a,t)});
   if(t.estado!=="hecha")gestos(li,t);return li}
 async function completar(t,li){const on=t.estado!=="hecha";li.classList.toggle("hecha",on);
   if(on){li.classList.add("sale");}try{await setHecha(t,on);toast(on?"✓ Hecha":"Reabierta");setTimeout(pintarTareas,on?380:0)}catch(e){li.classList.toggle("hecha",!on);li.classList.remove("sale");toast(e.message)}}
 async function accion(a,t){if(a==="foco")return abrirFoco(t);
+  if(a==="manana"){try{await quitarDeHoySiBloque(t);await setInicio(t,sumar(H(),1));toast("→ Mañana");pintarTareas()}catch(e){toast(e.message)}return}
   if(a==="trocear"){try{await capturar("trocear",`Trocear: ${t.texto}`,"",{id:t.id});toast("✂️ Pedido: el planificador la trocea")}catch(e){toast(e.message)}return}
   if(a==="atasco")return hoja(`<h2>¿Qué te bloquea?</h2><p class="mu">${esc(limpio(t.texto))}</p><textarea id="h-txt" placeholder="En una línea"></textarea><div class="row" style="margin-top:12px"><button class="btn p" id="h-ok">Enviar</button><button class="btn" data-cerrar>Cancelar</button></div>`,()=>{
     $("#h-ok").onclick=async()=>{const v=$("#h-txt").value.trim();if(!v)return;try{await capturar("atasco",v,"",{id:t.id});cerrarHoja();toast("🪨 Enviado")}catch(e){toast(e.message)}}});
@@ -551,7 +595,12 @@ $$("#area button").forEach(b=>b.onclick=()=>{area=b.dataset.a;$$("#area button")
 
 // ---------- navegación ----------
 function irA(v){$$("nav button").forEach(x=>x.classList.toggle("on",x.dataset.v===v));$$("section").forEach(s=>s.hidden=s.id!=="v-"+v);st.set("vista",v);gota();window.scrollTo({top:0})}
-function gota(){const b=$("nav button.on");if(!b)return;const g=$("#gota");g.style.left=b.offsetLeft+"px";g.style.width=b.offsetWidth+"px"}
+const riel=matchMedia("(min-width:1024px)");
+function gota(){const b=$("nav button.on");if(!b)return;const g=$("#gota");
+  if(riel.matches){g.style.left=g.style.width="";g.style.top=b.offsetTop+"px";g.style.height=b.offsetHeight+"px";g.style.bottom="auto"}
+  else{g.style.top=g.style.height=g.style.bottom="";g.style.left=b.offsetLeft+"px";g.style.width=b.offsetWidth+"px"}}
+addEventListener("keydown",e=>{if(e.key!=="Escape")return;cerrarHoja();$("#repaso").classList.remove("on");$("#foco").classList.remove("on")});
+riel.addEventListener("change",gota);
 $$("nav button").forEach(b=>b.onclick=()=>irA(b.dataset.v));addEventListener("resize",gota);
 $("#refr").onclick=cargar;setInterval(()=>panel&&linea(),6e4);
 $("#c-own").value=cfg().own;$("#c-rep").value=cfg().rep;$("#c-tok").value=cfg().tok;$("#c-groq").value=st.get("groq");$("#c-gmod").value=st.get("groqModel");

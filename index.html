@@ -544,10 +544,13 @@ function pintarPreguntas(){const el=$("#preguntas"),qs=(panel.preguntas||[]);el.
       panel.preguntas=panel.preguntas.filter(x=>x!==q);d.remove();toast("Respondido: "+v);vigilar()}catch(e){d.style.opacity=1;toast(e.message)}};
     d.querySelectorAll("button:not([data-otra])").forEach(b=>b.onclick=()=>resp(b.textContent));
     d.querySelector("[data-otra]").onclick=()=>{const v=prompt(q.texto);if(v&&v.trim())resp(v.trim())};el.appendChild(d)})}
-function pintarRespuestas(){const pend=JSON.parse(st.get("consultas")||"[]"),rs=(panel.respuestas||[]).slice().reverse();
-  const hechas=new Set(rs.map(r=>r.pregunta));const quedan=pend.filter(p=>!hechas.has(p));st.set("consultas",JSON.stringify(quedan));
-  $("#resps").innerHTML=modo!=="preg"?"":quedan.map(p=>`<div class="resp"><div class="q">${esc(p)}</div><div class="a mu">⏳ Buscando en clases, anuncios y PDFs…</div></div>`).join("")+
-    rs.slice(0,4).map(r=>`<div class="resp"><div class="q">${esc(r.pregunta)}</div><div class="a">${esc(r.respuesta)}</div>${r.fuente?`<div class="f">Fuente: ${esc(r.fuente)}</div>`:""}</div>`).join("")}
+function pintarRespuestas(){const rs=(panel.respuestas||[]).slice().reverse(),conR=rs.filter(r=>r.respuesta),pendS=rs.filter(r=>!r.respuesta).map(r=>r.pregunta);
+  const conocidas=new Set(rs.map(r=>r.pregunta));const loc=JSON.parse(st.get("consultas")||"[]").filter(p=>!conocidas.has(p));st.set("consultas",JSON.stringify(loc));
+  const quedan=[...loc,...pendS],hace12=Date.now()-12*36e5;
+  // en «Preguntar» se ve el historial; en «Contar algo», solo lo pendiente y lo respondido en las últimas 12 h
+  const vis=modo==="preg"?conR.slice(0,5):conR.filter(r=>r.respondida&&new Date(r.respondida)>hace12).slice(0,2);
+  $("#resps").innerHTML=quedan.map(p=>`<div class="resp"><div class="q">${esc(p)}</div><div class="a mu">⏳ Buscando en clases, anuncios y PDFs… (unos minutos)</div></div>`).join("")+
+    vis.map(r=>`<div class="resp"><div class="q">${esc(r.pregunta)}</div><div class="a">${esc(limpio(r.respuesta))}</div>${r.fuente?`<div class="f">Fuente: ${esc(r.fuente)}</div>`:""}</div>`).join("")}
 
 // ---------- bandeja ----------
 const CAT={pide:"Te piden algo",leer:"Para leer",info:"Informativo",ruido:"Ruido"};

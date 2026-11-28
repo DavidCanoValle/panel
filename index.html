@@ -53,9 +53,8 @@ h2{font:650 19px/1.2 -apple-system,system-ui,sans-serif;margin:0;letter-spacing:
 .mu{color:var(--mu);font-size:14px}
 a{color:var(--ac)}
 /* cabecera */
-header{position:sticky;top:calc(env(safe-area-inset-top) + 6px);z-index:20;border-radius:var(--r-xl);padding:12px 16px 12px;margin:0 0 14px;transition:padding .3s}
+header{position:sticky;top:calc(env(safe-area-inset-top) + 6px);z-index:20;border-radius:var(--r-xl);padding:12px 16px 12px;margin:0 0 14px}
 header .row{justify-content:space-between;flex-wrap:nowrap}
-header.min{padding:8px 16px}header.min h1{font-size:20px}header.min .linea-wrap{display:none}
 .live{display:none;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:5px 11px;border-radius:999px;background:var(--fill);border:1px solid var(--rim);position:relative;overflow:hidden}
 .live.on{display:inline-flex}
 .live::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.55) 50%,transparent 70%);transform:translateX(-100%);animation:brillo 1.8s infinite}
@@ -554,7 +553,6 @@ $$("#area button").forEach(b=>b.onclick=()=>{area=b.dataset.a;$$("#area button")
 function irA(v){$$("nav button").forEach(x=>x.classList.toggle("on",x.dataset.v===v));$$("section").forEach(s=>s.hidden=s.id!=="v-"+v);st.set("vista",v);gota();window.scrollTo({top:0})}
 function gota(){const b=$("nav button.on");if(!b)return;const g=$("#gota");g.style.left=b.offsetLeft+"px";g.style.width=b.offsetWidth+"px"}
 $$("nav button").forEach(b=>b.onclick=()=>irA(b.dataset.v));addEventListener("resize",gota);
-addEventListener("scroll",()=>$("#cab").classList.toggle("min",scrollY>60),{passive:true});
 $("#refr").onclick=cargar;setInterval(()=>panel&&linea(),6e4);
 $("#c-own").value=cfg().own;$("#c-rep").value=cfg().rep;$("#c-tok").value=cfg().tok;$("#c-groq").value=st.get("groq");$("#c-gmod").value=st.get("groqModel");
 $("#c-save").onclick=()=>{st.set("own",$("#c-own").value.trim());st.set("rep",$("#c-rep").value.trim());st.set("tok",$("#c-tok").value.trim());st.set("groq",$("#c-groq").value.trim());st.set("groqModel",$("#c-gmod").value.trim());toast("Guardado");cargar()};
